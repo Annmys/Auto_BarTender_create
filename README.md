@@ -1,6 +1,5 @@
 # A BarTender develope demo in C#
 
-![image](https://raw.githubusercontent.com/ospanic/Bartender_Dev_Dome/master/run.png)
 
 这是一个用c#语言编写的BarTender二次开发示例程序，展示了BarTender软件的部分功能。
 
@@ -12,9 +11,7 @@ BarTender 10.1 版本的软件可点击此处[此处](https://ai-thinker.oss-cn-
 
 1.双击软件安装包，一路NEXT完成安装。
 
-2.将破解软件复制到Bartender的安装目录，默认安装目录如下图所示：
-
-![image](https://raw.githubusercontent.com/ospanic/Bartender_Dev_Dome/master/kill.png)
+2.将破解软件复制到Bartender的安装目录，默认安装目录如下图所示。
 
 3.双击破解补丁，点击PATCH按钮完成破解。
 
@@ -32,4 +29,4 @@ BarTender 10.1 版本的软件可点击此处[此处](https://ai-thinker.oss-cn-
 	  <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.0,Profile=Client"/></startup>
 	</configuration>
 
-具体的开发细节就自己去看代码吧！！！
+具体的开发细节后续补充！
