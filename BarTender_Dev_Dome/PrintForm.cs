@@ -20,7 +20,9 @@ using Resolution = Seagull.BarTender.Print.Resolution;
 using OfficeOpenXml; // EPPlus的命名空间
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;  // 包含这个指令以使用 Task 和 async/await
-
+using MyLibrary; // 引入命名空间
+using maitou;
+using OfficeOpenXml.FormulaParsing.ExpressionGraph.FunctionCompilers;//唛头.cs
 
 
 
@@ -32,82 +34,94 @@ namespace BarTender_Dev_Dome
 {
     public partial class PrintForm : Form
     {
-    string bq_ipdj = null;
-    private string _bmp_path = Application.StartupPath + @"\exp.jpg";
+        string bq_ipdj = null;
+        private string _bmp_path = Application.StartupPath + @"\exp.jpg";
         private string _btw_path = "";
         string 模板地址 = "";
+        //string 软件版本 = "";
+        string 灯带系列 = "";
         string _sjk_path = "";
         string _PrinterName = "";
         string _wjm_ = "";
-        
+        string output_name = "Name:LED Flex Linear Light";
+        string output_灯带型号 = "";
+        string output_电压 = "";
+        string output_功率 = "";
+        string output_灯数 = "";
+        string output_剪切单元 = "";
+        string output_长度 = "Length:";
+        string output_色温 = "";
+        string output_尾巴 = "";
+
+
 
         //程序开始运行
         public PrintForm()
         {
             InitializeComponent();
             //MessageBox.Show("程序打开", "操作提示");
-            this.Load += new EventHandler(MainForm_Load); // 订阅窗体加载事件-读取配置文件
+            //this.Load += new EventHandler(MainForm_Load); // 订阅窗体加载事件-读取配置文件
+
+            //读取excel文件必须增加声明才能运行正常
+            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+
+
 
         }
 
-
-        //读取config配置文件1
-        private void MainForm_Load(object sender, EventArgs e)
+        //打印被点击
+        private void print_btn_Click(object sender, EventArgs e)
         {
-            string configFilePath = Application.StartupPath + @"\config\标签规格.txt" ; // 配置标签规格文件相对路径
-            string fullPath = Path.Combine(Application.StartupPath, configFilePath);
+            PrintBar();
+        }
 
-            if (File.Exists(fullPath))
+        //预览被点击
+        private void preview_btn_Click(object sender, EventArgs e)
+        {
+            PrintBar(true);
+        }
+
+
+
+        //筛选标签规格类型
+        private void button_筛选_Click_1(object sender, EventArgs e)
+        {
+            if (checkBox_常规型号.Checked)
             {
-                try
-                {
-                    comboBox_标签规格.Items.Clear(); // 清空现有的项
-                    // 读取所有行
-                    string[] specifications = File.ReadAllLines(fullPath);
+                // 如果选中，设置 comboBox_标签规格 为可见
+                comboBox_标签规格.Visible = true;
 
-                    foreach (string spec in specifications)
-                    {
-                        if (!string.IsNullOrWhiteSpace(spec))
-                        {
-                            comboBox_标签规格.Items.Add(spec);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("读取配置文件时出错: " + ex.Message);
-                }
+                // 重置 comboBox_标签规格
+                comboBox_标签规格.Items.Clear();
+
+                // 重新加载标签规格
+                获取标签规格("常规型号");
+            }
+            else if(checkBox_客制型号.Checked)
+            {
+                // 如果选中，设置 comboBox_客户编号 为可见
+                comboBox_标签规格.Visible = true;
+
+                // 重置 comboBox_标签规格
+                comboBox_标签规格.Items.Clear();
+
+                // 重新加载标签规格
+                获取标签规格("客制型号");
             }
             else
             {
-                MessageBox.Show("配置文件未找到: " + fullPath);
+                // 如果未选中，设置 comboBox_客户编号 为不可见
+                comboBox_标签规格.Visible = false;
             }
+
+
+            
+
+            // 执行筛选逻辑
+            //FilterSpecifications();
         }
 
-        //读取config配置文件2
-        private void LoadLabelSpecifications()
-        {
-            string configFilePath = Application.StartupPath + @"\config\标签规格.txt"; // 配置文件相对路径
-            string fullPath = Path.Combine(Application.StartupPath, configFilePath);
 
-            if (File.Exists(fullPath))
-            {
-                // 从文件中读取所有行
-                string[] specifications = File.ReadAllLines(fullPath);
-
-                foreach (string spec in specifications)
-                {
-                    if (!string.IsNullOrWhiteSpace(spec))
-                    {
-                        comboBox_标签规格.Items.Add(spec);
-                    }
-                }
-            }
-            else
-            {
-                MessageBox.Show("配置文件未找到: " + fullPath);
-            }
-        }
 
         // 执行筛选逻辑
         private void FilterSpecifications()
@@ -116,42 +130,15 @@ namespace BarTender_Dev_Dome
             HashSet<string> specsToKeep = new HashSet<string>();
 
             // 根据复选框的状态添加对应的规格到集合中
-            if (checkBox_中性.Checked)
+            if (checkBox_常规型号.Checked)
             {
-                specsToKeep.Add("中性");
+                specsToKeep.Add("常规型号");
             }
-            if (checkBox_Clear.Checked)
+            if (checkBox_客制型号.Checked)
             {
-                specsToKeep.Add("Clear");
+                specsToKeep.Add("客制型号");
             }
-            if (checkBox_客制.Checked)
-            {
-                specsToKeep.Add("客制");
-            }
-            if (checkBox_低压.Checked)
-            {
-                specsToKeep.Add("低压");
-            }
-            if (checkBox_高压.Checked)
-            {
-                specsToKeep.Add("高压");
-            }
-            if (checkBox_水下.Checked)
-            {
-                specsToKeep.Add("水下");
-            }
-            if (checkBox_桑拿.Checked)
-            {
-                specsToKeep.Add("桑拿");
-            }
-            if (checkBox_温泉水.Checked)
-            {
-                specsToKeep.Add("温泉水");
-            }
-            if (checkBox_高温高湿.Checked)
-            {
-                specsToKeep.Add("高温高湿");
-            }
+            
 
             // ... 为其他复选框添加相应的条件
 
@@ -184,26 +171,13 @@ namespace BarTender_Dev_Dome
             }
         }
 
-        //筛选标签规格类型
-        private void button_筛选_Click(object sender, EventArgs e)
-        {
 
-            // 重置 comboBox_标签规格
-            comboBox_标签规格.Items.Clear();
-
-            // 重新加载标签规格
-            LoadLabelSpecifications();
-
-            // 执行筛选逻辑
-            FilterSpecifications();
-
-        }
 
 
         private void 获取标签种类()
         {
             // 软件运行目录
-            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string baseDirectory = "\\\\192.168.1.33\\Annmy\\订单标签自动生成软件";
 
             // 指定moban文件夹路径
             string templatesDirectory = Path.Combine(baseDirectory, "moban");
@@ -231,13 +205,82 @@ namespace BarTender_Dev_Dome
             }
         }
 
+        private void 获取标签规格(string aa)
+        {
+            string templatesDirectory;
+            string _btw_path_1;
+            // 软件运行目录
+            string baseDirectory = "\\\\192.168.1.33\\Annmy\\订单标签自动生成软件\\moban";
 
+            // 拼接标签种类_comboBox.Text 到基础目录
+            if (aa == "常规型号")
+            {
+                templatesDirectory = Path.Combine(baseDirectory, @"\常规型号" + @"\" );
+                
+                _btw_path_1 =  @"\\192.168.1.33\Annmy\订单标签自动生成软件\moban\" + 标签种类_comboBox.Text + @"\" + aa + @"\";
+                // 清空ComboBox中的现有项
+                comboBox_标签规格.Items.Clear();
+
+                // 判断moban文件夹是否存在
+                if (Directory.Exists(_btw_path_1))
+                {
+                    // 获取moban文件夹内的所有文件夹
+                    string[] directories = Directory.GetDirectories(_btw_path_1);
+
+
+                    // 遍历所有文件夹
+                    foreach (string directory in directories)
+                    {
+                        // 获取文件夹名称并添加到ComboBox中
+                        string folderName = Path.GetFileName(directory);
+                        comboBox_标签规格.Items.Add(folderName);
+                    }
+                }
+                else
+                {
+                    // 如果文件夹不存在，弹出消息框提示用户
+                    MessageBox.Show("文件夹不存在。");
+                }
+            }
+            if(aa =="客制型号")
+            {
+                templatesDirectory = Path.Combine(baseDirectory, @"\客制型号" );
+                _btw_path_1 =  @"\\192.168.1.33\Annmy\订单标签自动生成软件\moban\" + 标签种类_comboBox.Text + @"\" + aa + @"\";
+                // 清空ComboBox中的现有项
+                comboBox_标签规格.Items.Clear();
+
+                // 判断moban文件夹是否存在
+                if (Directory.Exists(_btw_path_1))
+                {
+                    // 获取moban文件夹内的所有文件夹
+                    string[] directories = Directory.GetDirectories(_btw_path_1);
+
+
+                    // 遍历所有文件夹
+                    foreach (string directory in directories)
+                    {
+                        // 获取文件夹名称并添加到ComboBox中
+                        string folderName = Path.GetFileName(directory);
+                        comboBox_标签规格.Items.Add(folderName);
+                    }
+                }
+                else
+                {
+                    // 如果文件夹不存在，弹出消息框提示用户
+                    MessageBox.Show("文件夹不存在。");
+                }
+            }
+            
+
+            
+        }
+
+        //软件开启加载标签种类
         private void PrintForm_Load(object sender, EventArgs e)
         {
+
             获取标签种类();
 
-            //标签种类_comboBox.Items.Add("工字标");
-            //标签种类_comboBox.Items.Add("测试标");
 
             Printers printers = new Printers();
             foreach (Printer printer in printers)
@@ -254,196 +297,989 @@ namespace BarTender_Dev_Dome
         }
 
 
-        private void openFilebtn_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog dialog = new OpenFileDialog();
-            dialog.Multiselect = false;//多个文件
-            dialog.Title = "请选择要烧录的文件";
-            dialog.Filter = "bwt文件(*.btw)|*.btw";
-            dialog.InitialDirectory = Application.StartupPath;
-
-            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                _btw_path = dialog.FileName;
-                fileNametBox.Text = dialog.FileName;
-                // fileNametBox.Text = dialog.SafeFileName;
-                fileNametBox.BackColor = System.Drawing.Color.LightGreen;
-
-                pictureBox.Image = null;
-                using (Engine btEngine = new Engine(true))
-                {
-                    LabelFormatDocument labelFormat = btEngine.Documents.Open(_btw_path);
-
-                    if (labelFormat != null)
-                    {
-                        Seagull.BarTender.Print.Messages m;
-                        labelFormat.ExportPrintPreviewToFile(Application.StartupPath, @"\exp.bmp", ImageType.JPEG, Seagull.BarTender.Print.ColorDepth.ColorDepth24bit, new Resolution(300, 300), System.Drawing.Color.White, OverwriteOptions.Overwrite, true, true, out m);
-                        labelFormat.ExportImageToFile(_bmp_path, ImageType.JPEG, Seagull.BarTender.Print.ColorDepth.ColorDepth24bit, new Resolution(300, 300), OverwriteOptions.Overwrite);
-
-                        Image image = Image.FromFile(_bmp_path);
-                        Bitmap NmpImage = new Bitmap(image);
-                        pictureBox.Image = NmpImage;
-                        image.Dispose();
-                    }
-                    else
-                    {
-                        MessageBox.Show("生成图片错误", "操作提示");
-                    }
-                }
-            }
-        }
-
         private void printer_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             _PrinterName = printer_comboBox.Text;
         }
 
+        //标签种类被选择时
         private void 标签种类_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            
-            
-              string currentDirectory = Directory.GetCurrentDirectory();
-              _btw_path = currentDirectory +@"\moban\"+ 标签种类_comboBox.Text + @"\";
-              fileNametBox.Text = currentDirectory+ @"\moban\"+ 标签种类_comboBox.Text + @"\";
-            
+
+            //获取标签规格("常规型号");
+
+              //string currentDirectory = Directory.GetCurrentDirectory();
+              _btw_path =  @"\\192.168.1.33\Annmy\订单标签自动生成软件\moban\" + 标签种类_comboBox.Text + @"\";
+              fileNametBox.Text = @"\\192.168.1.33\Annmy\订单标签自动生成软件\moban\" + 标签种类_comboBox.Text + @"\";
+
+
+            // 检查 comboBox 是否有选中项
+            if (标签种类_comboBox.SelectedIndex != -1)
+            {
+                // 如果有选择项，则显示 groupBox4
+                groupBox4.Visible = true;
+            }
+            else
+            {
+                // 如果没有选择项，则隐藏 groupBox4
+                groupBox4.Visible = false;
+            }
+
+
+
 
         }
 
-        //预览和打印
-        void PrintBar(bool isPreView = false)
+
+        private string 重构产品信息_工字标(string name_CPXXBox, string textBox_剪切长度)
+        {
+            // 检查 name_CPXXBox 是否包含特定的标识 ")\nLength:"，并找到它的位置
+            int lengthIndex = name_CPXXBox.IndexOf(")\nLength:");
+            if (lengthIndex != -1)
+            {
+                // 调整 lengthIndex 以确保它位于 ")\nLength:" 后面
+                lengthIndex += ")\nLength:".Length;
+            }
+            else
+            {
+                // 如果没有找到 ")\nLength:"，可以决定如何处理这种情况
+                // 例如，可以返回原始的 name_CPXXBox 或者返回一个错误消息
+                return "指定的标识 ')\nLength:' 不存在。";
+            }
+
+            // 使用 StringBuilder 创建新的文本
+            StringBuilder newText = new StringBuilder(name_CPXXBox);
+
+            // 移除从找到的位置到字符串末尾的所有内容
+            newText.Remove(lengthIndex, newText.Length - lengthIndex);
+
+            // 在找到的位置后面插入 textBox_剪切长度 的内容
+            newText.Insert(lengthIndex, textBox_剪切长度);
+
+            // 在文本末尾追加其他信息
+            newText.Append("\n" + output_色温);
+            newText.Append("\n" + output_尾巴);
+
+            // 返回构建好的字符串
+            return newText.ToString();
+        }
+
+
+
+            //预览和打印
+            void PrintBar(bool isPreView = false)
         {
             // 假设这是从某个文本框获取的字符串
             string cpxx_text =cpxxBox.Text;
             判断产品信息(cpxx_text);
-           
 
-
-            if (_btw_path.Length < 5)
+            //执行工字标和品名标
+            if (标签种类_comboBox.Text == "工字标" || 标签种类_comboBox.Text == "品名标")
             {
-                fileNametBox.BackColor = Color.Red;
-                return;
-            }
-            using (Engine btEngine = new Engine(true))
-            {
-
-                寻找文件名_单字匹配("正弯", "侧弯");
-
-                模板地址  = _btw_path + _wjm_;
-                模板地址 = 模板地址.Replace("\n", "").Replace("\r", "");  //去除换行符，否则下面会报错
-                //MessageBox.Show(模板地址, "操作提示");
-                //cpxxBox.Text = _btw_path;
-
-                
-
-                if (_wjm_.Length > 2)
+                if (_btw_path.Length < 5)
                 {
-                    LabelFormatDocument labelFormat = btEngine.Documents.Open(模板地址);
+                    fileNametBox.BackColor = Color.Red;
+                    return;
+                }
 
-                    //LabelFormatDocument labelFormat = btEngine.Documents.Open(@"E:\正在进行项目\经管中心-标签打印\python\BarTender_Dev_Dome-master\BarTender_Dev_Dome-master\BarTender_Dev_Dome\bin\Debug\moban\工字标\tesssst-正弯.btw");
-                    try
+                using (Engine btEngine = new Engine(true))
+                {
+
+                    if (!_btw_path.Contains(comboBox_标签规格.Text))
                     {
-                        labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
-                        labelFormat.SubStrings.SetSubString("CPCD", TextBox_sku.Text);
-                        labelFormat.SubStrings.SetSubString("IPDJ", bq_ipdj);
+                       // _btw_path = _btw_path + comboBox_标签规格.Text; // 如果不包含，则拼接
 
-                        labelFormat.SubStrings.SetSubString("test", "实心.jpg");
-
-                    }
-
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("修改内容出错 " + ex.Message, "操作提示");
-                    }
-
-                    //labelFormat.SaveAs(@"E:\正在进行项目\经管中心-标签打印\python\BarTender_Dev_Dome-master\BarTender_Dev_Dome-master\BarTender_Dev_Dome\bin\Debug\moban\工字标\1111.btw", true);
-
-                    pictureBox.Image = null;
-
-                    if (labelFormat != null)
-                    {
-                        //MessageBox.Show(_bmp_path, "操作提示");
-                        //Generate a thumbnail for it.
-                        labelFormat.ExportImageToFile(_bmp_path, ImageType.BMP, Seagull.BarTender.Print.ColorDepth.ColorDepth24bit, new Resolution(407, 407), OverwriteOptions.Overwrite);
-                        System.Drawing.Image image = System.Drawing.Image.FromFile(_bmp_path);
-                        Bitmap NmpImage = new Bitmap(image);
-                        pictureBox.Image = NmpImage;
-                        image.Dispose();
-                    }
-                    else
-                    {
-                        MessageBox.Show("生成图片错误", "操作提示");
-                    }
-
-                    if (isPreView) return;
-
-                    if (_PrinterName != "")
-                    {
-                        int 次数 = Convert.ToInt32(textBox1 .Text) ;
-
-                        labelFormat.PrintSetup.PrinterName = _PrinterName;
-                        for (int i = 0; i < 次数; i++)
+                        if (checkBox_常规型号.Checked  )
                         {
-                            labelFormat.Print("BarPrint" + DateTime.Now,3 * 1000);
+                            _btw_path = _btw_path +@"常规型号\"+ comboBox_标签规格.Text ;
                         }
-                            
-                        //labelFormat.Print("OK");
-                        //labelFormat.Print("BarPrint" + DateTime.Now, 3 * 1000);
+                        else if (checkBox_客制型号.Checked  )
+                        {
+                            _btw_path = _btw_path +@"客制型号\"+ comboBox_标签规格.Text ;
+                        }
 
+
+                    }
+
+                    //MessageBox.Show(_btw_path);   
+
+                    //寻找文件名_单字匹配("正弯", "侧弯");
+                    string 复选框 = 判断复选框内容(cpxxBox.Text, comboBox_标签规格.Text);
+                    //MessageBox.Show(复选框);
+
+                    //读取excel文件必须增加声明才能运行正常
+                    ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+
+                    // 检查文本框内容是否不为空
+                    if (!string.IsNullOrEmpty(Box_数据库.Text))
+                    {
+                        // 读取Excel文件的B、C、D、E、F列内容
+                        string filePath = Box_数据库.Text; // 假设这是Excel文件路径的文本框
+                        Dictionary<int, bool> columnHasContent = new Dictionary<int, bool>();
+
+                        using (var package = new ExcelPackage(new FileInfo(filePath)))
+                        {
+                            var worksheet = package.Workbook.Worksheets[0];
+                            for (int col = 2; col <= 6; col++) // B到F列的索引是2到6
+                            {
+                                var cell = worksheet.Cells[2, col]; // 假设从第二行开始读取
+                                columnHasContent[col] = !string.IsNullOrEmpty(cell.Text?.Trim());
+                            }
+                        }
+
+                        // 根据列内容设置 _wjm_
+                        if (columnHasContent[2] && columnHasContent[3] && columnHasContent[4] && columnHasContent[5] && columnHasContent[6])
+                        {
+                            _wjm_ = "5.btw";
+                        }
+                        else if (columnHasContent[2] && columnHasContent[3] && columnHasContent[4] && columnHasContent[5] && !columnHasContent[6])
+                        {
+                            _wjm_ = "4.btw";
+                        }
+                        else if (columnHasContent[2] && columnHasContent[3] && columnHasContent[4] && !columnHasContent[5] && !columnHasContent[6])
+                        {
+                            _wjm_ = "3.btw";
+                        }
+                        else if (columnHasContent[2] && (!columnHasContent[3] || (columnHasContent[3] && !columnHasContent[4])) && !columnHasContent[5] && !columnHasContent[6])
+                        {
+                            _wjm_ = "1.btw";
+                        }
+                        else
+                        {
+                            // 如果不符合上述任一条件，可以设置默认值或者抛出异常
+                            _wjm_ = "1.btw"; // 默认值
+                                             // 或者 throw new Exception("Excel文件的列内容不符合要求");
+                        }
                     }
                     else
                     {
-                        MessageBox.Show("请先选择打印机", "操作提示");
+                        _wjm_ = "1.btw";
                     }
+
+
+
+                    模板地址 = _btw_path + @"\" + _wjm_;
+                    //MessageBox.Show(模板地址, "操作提示");
+                    模板地址 = 模板地址.Replace("\n", "").Replace("\r", "");  //去除换行符，否则下面会报错
+                    //MessageBox.Show(模板地址);
+
+
+                    if (_wjm_.Length > 2)
+                    {
+                        LabelFormatDocument labelFormat = btEngine.Documents.Open(模板地址);
+
+                        try
+                        {
+                            //构建的新文本赋值给 name_CPXXBox 的 Text 属性
+
+                            //int lengthIndex = name_CPXXBox.Text.IndexOf(")\nLength:") + ")\nLength:".Length;
+                            //StringBuilder newText = new StringBuilder(name_CPXXBox.Text);
+                            //newText.Remove(lengthIndex, newText.Length - lengthIndex);
+                            //newText.Insert(lengthIndex, textBox_剪切长度.Text);
+                            //newText.Append("\n"+output_色温);
+                            //newText.Append("\n"+ output_尾巴 );
+                            //MessageBox.Show(newText.ToString());
+                            //name_CPXXBox.Text = newText.ToString();
+
+                            // 调用方法时，可以这样使用返回的字符串
+                            name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, textBox_剪切长度.Text);
+                            //MessageBox.Show(name_CPXXBox.Text);
+
+
+
+
+                            labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+                            //labelFormat.SubStrings.SetSubString("CPCD", textBox_剪切长度.Text);
+                            labelFormat.SubStrings.SetSubString("CPCD", " ");
+                            labelFormat.SubStrings.SetSubString("FXK", 复选框);
+                            labelFormat.SubStrings.SetSubString("XLH", " ");
+
+                            if (comboBox_标签规格.Text.Contains("水下"))
+                            {
+                                labelFormat.SubStrings.SetSubString("IPDJ", "IP68 5m");
+                            }
+                            else
+                            {
+                                labelFormat.SubStrings.SetSubString("IPDJ", bq_ipdj);
+                            }
+
+                            //高压情况
+                            if (comboBox_标签规格.Text.Contains("高压")) { double.TryParse(textBox_剪切长度.Text, out double length); double result = length * 3.28;labelFormat.SubStrings.SetSubString("CPCD-2", result.ToString());
+                                double washu = length * 10;double anpai = length * 0.093;labelFormat.SubStrings.SetSubString("CPXX-2", washu .ToString()+"W,"+anpai.ToString()+"A");
+                            }
+                            
+
+                            //写入2排标识码时候的内容
+
+
+                            //判断是否增加标识码
+                            if (checkBox_标识码01.Checked)
+                            {
+                                labelFormat.SubStrings.SetSubString("BSM-01", textBox_标识码01.Text);
+                            }
+                            else
+                            {
+                                labelFormat.SubStrings.SetSubString("BSM-01", " ");
+                            }
+                            if (checkBox_标识码02.Checked)
+                            {
+                                labelFormat.SubStrings.SetSubString("BSM-02", textBox_标识码02.Text);
+                            }
+                            else
+                            {
+                                labelFormat.SubStrings.SetSubString("BSM-02", " ");
+                            }
+
+                            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+
+                            // 检查数据库地址不为空时
+                            if (!string.IsNullOrEmpty(Box_数据库.Text))
+                            {
+
+                                string b2Data, c2Data, g2Data, h2Data, a2Data, d2Data, e2Data, f2Data, i2Data;
+
+                                // 使用EPPlus打开Excel文件
+                                using (var package = new ExcelPackage(new FileInfo(Box_数据库.Text)))
+                                {
+                                    // 假设Excel工作表名为"Sheet1"
+                                    var worksheet = package.Workbook.Worksheets["Sheet1"];
+
+                                    // 读取B2和C2单元格的数据
+                                    a2Data = worksheet.Cells["A2"].Value?.ToString() ?? string.Empty;
+                                    b2Data = worksheet.Cells["B2"].Value?.ToString() ?? string.Empty;
+                                    c2Data = worksheet.Cells["C2"].Value?.ToString() ?? string.Empty;
+                                    d2Data = worksheet.Cells["D2"].Value?.ToString() ?? string.Empty;
+                                    e2Data = worksheet.Cells["E2"].Value?.ToString() ?? string.Empty;
+                                    f2Data = worksheet.Cells["F2"].Value?.ToString() ?? string.Empty;
+                                    g2Data = worksheet.Cells["G2"].Value?.ToString() ?? string.Empty;
+                                    h2Data = worksheet.Cells["H2"].Value?.ToString() ?? string.Empty;
+                                    h2Data = worksheet.Cells["H2"].Value?.ToString() ?? string.Empty;
+                                    i2Data = worksheet.Cells["I2"].Value?.ToString() ?? string.Empty;
+                                }
+
+                                switch (_wjm_)
+                                {
+                                    case "1.btw":
+                                        labelFormat.SubStrings.SetSubString("XLH", a2Data);
+                                        labelFormat.SubStrings.SetSubString("BSM-01", b2Data);
+                                        labelFormat.SubStrings.SetSubString("BSM-02", c2Data);
+                                        textBox1.Text = g2Data;
+                                        //labelFormat.SubStrings.SetSubString("CPCD", h2Data);
+                                        name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, h2Data);
+                                        //高压情况
+                                        if (comboBox_标签规格.Text.Contains("高压"))
+                                        {
+                                            double.TryParse(h2Data, out double length); double result = length * 3.28; labelFormat.SubStrings.SetSubString("CPCD-2", result.ToString());
+                                            double washu = length * 10; double anpai = length * 0.093; labelFormat.SubStrings.SetSubString("CPXX-2", washu.ToString() + "W," + anpai.ToString() + "A");
+                                        }
+
+                                        labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+
+                                        labelFormat.SubStrings.SetSubString("CPCD", " ");
+
+                                        //客户型号被选择时
+                                        if (checkBox_客户型号.Checked)
+                                        {
+                                            //output_灯带型号 = "ART. No.: " + i2Data;
+                                            int ai = i2Data.Length;
+                                            if (ai <= 19) { output_灯带型号 = "ART. No.: " + i2Data; }
+                                            else if (ai > 19 && ai <= 27) { output_灯带型号 = "ART. No.: " + Environment.NewLine + i2Data; }
+                                            else { output_灯带型号 = "ART. No.: " + i2Data.Substring(0, 19) + Environment.NewLine + i2Data.Substring(19); }
+                                            name_CPXXBox.Text = output_name + "\n" + output_灯带型号 + "\n" + output_电压 + "\n" + output_功率 + "\n" + output_灯数 + "\n" + output_剪切单元 + "\n" + output_长度 + "\n" + output_色温 + "\n" + output_尾巴;
+                                            name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, h2Data);
+
+                                            labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+                                        }
+
+                                        break;
+                                    case "3.btw":
+                                        labelFormat.SubStrings.SetSubString("XLH", a2Data);
+                                        labelFormat.SubStrings.SetSubString("BSM-01", b2Data);
+                                        labelFormat.SubStrings.SetSubString("BSM-02", c2Data);
+                                        labelFormat.SubStrings.SetSubString("BSM-03", d2Data);
+                                        textBox1.Text = g2Data;
+                                        //labelFormat.SubStrings.SetSubString("CPCD", h2Data);
+                                        name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, h2Data);
+                                        labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+
+                                        //高压情况
+                                        if (comboBox_标签规格.Text.Contains("高压"))
+                                        {
+                                            double.TryParse(h2Data, out double length); double result = length * 3.28; labelFormat.SubStrings.SetSubString("CPCD-2", result.ToString());
+                                            double washu = length * 10; double anpai = length * 0.093; labelFormat.SubStrings.SetSubString("CPXX-2", washu.ToString() + "W," + anpai.ToString() + "A");
+                                        }
+
+                                        labelFormat.SubStrings.SetSubString("CPCD", " ");
+
+                                        //客户型号被选择时
+                                        if (checkBox_客户型号.Checked)
+                                        {
+                                            //output_灯带型号 = "ART. No.: " + i2Data;
+                                            int ai = i2Data.Length;
+                                            if (ai <= 19) { output_灯带型号 = "ART. No.: " + i2Data; }
+                                            else if (ai > 19 && ai <= 27) { output_灯带型号 = "ART. No.: " + Environment.NewLine + i2Data; }
+                                            else { output_灯带型号 = "ART. No.: " + i2Data.Substring(0, 19) + Environment.NewLine + i2Data.Substring(19); }
+                                            name_CPXXBox.Text = output_name + "\n" + output_灯带型号 + "\n" + output_电压 + "\n" + output_功率 + "\n" + output_灯数 + "\n" + output_剪切单元 + "\n" + output_长度 + "\n" + output_色温 + "\n" + output_尾巴;
+                                            name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, h2Data);
+                                            labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+                                        }
+
+                                        break;
+                                    case "4.btw":
+                                        labelFormat.SubStrings.SetSubString("XLH", a2Data);
+                                        labelFormat.SubStrings.SetSubString("BSM-01", b2Data);
+                                        labelFormat.SubStrings.SetSubString("BSM-02", c2Data);
+                                        labelFormat.SubStrings.SetSubString("BSM-03", d2Data);
+                                        labelFormat.SubStrings.SetSubString("BSM-04", e2Data);
+                                        textBox1.Text = g2Data;
+                                        //labelFormat.SubStrings.SetSubString("CPCD", h2Data);
+                                        name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, h2Data);
+                                        labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+
+                                        //高压情况
+                                        if (comboBox_标签规格.Text.Contains("高压"))
+                                        {
+                                            double.TryParse(h2Data, out double length); double result = length * 3.28; labelFormat.SubStrings.SetSubString("CPCD-2", result.ToString());
+                                            double washu = length * 10; double anpai = length * 0.093; labelFormat.SubStrings.SetSubString("CPXX-2", washu.ToString() + "W," + anpai.ToString() + "A");
+                                        }
+
+                                        labelFormat.SubStrings.SetSubString("CPCD", " ");
+
+                                        //客户型号被选择时
+                                        if (checkBox_客户型号.Checked)
+                                        {
+                                            //output_灯带型号 = "ART. No.: " + i2Data;
+                                            int ai = i2Data.Length;
+                                            if (ai <= 19) { output_灯带型号 = "ART. No.: " + i2Data; }
+                                            else if (ai > 19 && ai <= 27) { output_灯带型号 = "ART. No.: " + Environment.NewLine + i2Data; }
+                                            else { output_灯带型号 = "ART. No.: " + i2Data.Substring(0, 19) + Environment.NewLine + i2Data.Substring(19); }
+                                            name_CPXXBox.Text = output_name + "\n" + output_灯带型号 + "\n" + output_电压 + "\n" + output_功率 + "\n" + output_灯数 + "\n" + output_剪切单元 + "\n" + output_长度 + "\n" + output_色温 + "\n" + output_尾巴;
+                                            name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, h2Data);
+                                            labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+                                        }
+                                        break;
+                                    case "5.btw":
+                                        labelFormat.SubStrings.SetSubString("XLH", a2Data);
+                                        labelFormat.SubStrings.SetSubString("BSM-01", b2Data);
+                                        labelFormat.SubStrings.SetSubString("BSM-02", c2Data);
+                                        labelFormat.SubStrings.SetSubString("BSM-03", d2Data);
+                                        labelFormat.SubStrings.SetSubString("BSM-04", e2Data);
+                                        labelFormat.SubStrings.SetSubString("BSM-05", f2Data);
+                                        textBox1.Text = g2Data;
+                                        //labelFormat.SubStrings.SetSubString("CPCD", h2Data);
+                                        name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, h2Data);
+                                        labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+
+
+
+                                        labelFormat.SubStrings.SetSubString("CPCD", " ");
+
+
+                                        //客户型号被选择时
+                                        if (checkBox_客户型号.Checked)
+                                        {
+                                            //output_灯带型号 = "ART. No.: " + i2Data;
+                                            int ai = i2Data.Length;
+                                            if (ai <= 19) { output_灯带型号 = "ART. No.: " + i2Data; }
+                                            else if (ai > 19 && ai <= 27) { output_灯带型号 = "ART. No.: " + Environment.NewLine + i2Data; }
+                                            else { output_灯带型号 = "ART. No.: " + i2Data.Substring(0, 19) + Environment.NewLine + i2Data.Substring(19); }
+                                            name_CPXXBox.Text = output_name + "\n" + output_灯带型号 + "\n" + output_电压 + "\n" + output_功率 + "\n" + output_灯数 + "\n" + output_剪切单元 + "\n" + output_长度 + "\n" + output_色温 + "\n" + output_尾巴;
+                                            name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, h2Data);
+                                            labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+                                        }
+
+                                        break;
+                                    default:
+                                        MessageBox.Show("未知的模板文件。");
+                                        return;
+                                }
+
+
+
+
+
+
+                            }
+
+
+                            //判断显指内容
+                            // 重置 XZ 字段的内容
+                            labelFormat.SubStrings.SetSubString("XZ", "");
+                            string BPrefixContent = string.Empty; // 用于存储 "B-" 前面的内容
+
+                            // 查找 "B-" 并获取它之前的所有内容
+                            int BIndex = cpxxBox.Text.IndexOf("\r\nB-");
+                            if (BIndex != -1 && BIndex > 0) // 确保 "B-" 存在且不是在字符串开头
+                            {
+                                BPrefixContent = cpxxBox.Text.Substring(0, BIndex).Trim();
+                            }
+                            //MessageBox.Show(灯带系列);
+                            // 检查是否存在 "Ra90" 或 "Ra95"
+                            bool containsRa90 = BPrefixContent.Contains("Ra90");
+                            bool containsRa95 = BPrefixContent.Contains("Ra95");
+
+                            if (BPrefixContent.Contains("三面发光"))
+                            {
+                                labelFormat.SubStrings.SetSubString("XZ", 灯带系列 + @"T");
+                                labelFormat.SubStrings.SetSubString("FXK-2", "实.png");
+                                labelFormat.SubStrings.SetSubString("XZ-2", " ");
+                                labelFormat.SubStrings.SetSubString("FXK-3", "空.png");
+                                // 如果同时存在DTW和Ra90或Ra95，设置额外的子字符串
+                                if (containsRa90 || containsRa95)
+                                {
+                                    labelFormat.SubStrings.SetSubString("FXK-3", "实.png");
+                                    string raValue = containsRa90 ? "Ra90" : (containsRa95 ? "Ra95" : "");
+                                    labelFormat.SubStrings.SetSubString("XZ-2", raValue);
+                                }
+
+                            }
+                            else if (BPrefixContent.Contains("高亮"))
+                            {
+                                labelFormat.SubStrings.SetSubString("XZ", "BH");
+                                labelFormat.SubStrings.SetSubString("FXK-2", "实.png");
+                                labelFormat.SubStrings.SetSubString("XZ-2", " ");
+                                labelFormat.SubStrings.SetSubString("FXK-3", "空.png");
+                                // 如果同时存在DTW和Ra90或Ra95，设置额外的子字符串
+                                if (containsRa90 || containsRa95)
+                                {
+                                    labelFormat.SubStrings.SetSubString("FXK-3", "实.png");
+                                    string raValue = containsRa90 ? "Ra90" : (containsRa95 ? "Ra95" : "");
+                                    labelFormat.SubStrings.SetSubString("XZ-2", raValue);
+                                }
+
+                            }
+                            else if (BPrefixContent.Contains("翻边"))
+                            {
+                                labelFormat.SubStrings.SetSubString("XZ", "BF");
+                                labelFormat.SubStrings.SetSubString("FXK-2", "实.png");
+                                labelFormat.SubStrings.SetSubString("XZ-2", " ");
+                                labelFormat.SubStrings.SetSubString("FXK-3", "空.png");
+                                // 如果同时存在DTW和Ra90或Ra95，设置额外的子字符串
+                                if (containsRa90 || containsRa95)
+                                {
+                                    labelFormat.SubStrings.SetSubString("FXK-3", "实.png");
+                                    string raValue = containsRa90 ? "Ra90" : (containsRa95 ? "Ra95" : "");
+                                    labelFormat.SubStrings.SetSubString("XZ-2", raValue);
+                                }
+
+                            }
+                            else if (BPrefixContent.Contains("DTW"))
+                            {
+                                labelFormat.SubStrings.SetSubString("XZ", "DTW");
+                                labelFormat.SubStrings.SetSubString("FXK-2", "实.png");
+                                labelFormat.SubStrings.SetSubString("XZ-2", " ");
+                                labelFormat.SubStrings.SetSubString("FXK-3", "空.png");
+                                // 如果同时存在DTW和Ra90或Ra95，设置额外的子字符串
+                                if (containsRa90 || containsRa95)
+                                {
+                                    labelFormat.SubStrings.SetSubString("FXK-3", "实.png");
+                                    string raValue = containsRa90 ? "Ra90" : (containsRa95 ? "Ra95" : "");
+                                    labelFormat.SubStrings.SetSubString("XZ-2", raValue);
+                                }
+
+                            }
+                            else if (灯带系列 == "D")
+                            {
+                                labelFormat.SubStrings.SetSubString("XZ", "D");
+                                labelFormat.SubStrings.SetSubString("FXK-2", "实.png");
+                                labelFormat.SubStrings.SetSubString("XZ-2", " ");
+                                labelFormat.SubStrings.SetSubString("FXK-3", "空.png");
+                                if (containsRa90 || containsRa95)
+                                {
+                                    labelFormat.SubStrings.SetSubString("FXK-3", "实.png");
+                                    string raValue = containsRa90 ? "Ra90" : (containsRa95 ? "Ra95" : "");
+                                    labelFormat.SubStrings.SetSubString("XZ-2", raValue);
+                                }
+                            }
+                            else if (BPrefixContent.Contains("Ra90"))
+                            {
+                                labelFormat.SubStrings.SetSubString("XZ", "Ra90");
+                                labelFormat.SubStrings.SetSubString("FXK-2", "实.png");
+                                labelFormat.SubStrings.SetSubString("XZ-2", " ");
+                                labelFormat.SubStrings.SetSubString("FXK-3", "空.png");
+
+                            }
+                            else if (BPrefixContent.Contains("Ra95"))
+                            {
+                                labelFormat.SubStrings.SetSubString("XZ", "Ra95");
+                                labelFormat.SubStrings.SetSubString("FXK-2", "实.png");
+                                labelFormat.SubStrings.SetSubString("XZ-2", " ");
+                                labelFormat.SubStrings.SetSubString("FXK-3", "空.png");
+                            }
+                            else
+                            {
+                                // 如果没有找到上述任何关键字，则设置为空
+                                labelFormat.SubStrings.SetSubString("XZ", "");
+                                labelFormat.SubStrings.SetSubString("XZ-2", " ");
+                                labelFormat.SubStrings.SetSubString("FXK-2", "空.png");
+                                labelFormat.SubStrings.SetSubString("FXK-3", "空.png");
+                            }
+
+                            //检查是否为非水下内容
+                            // 检查 cpxxBox.Text 中是否同时包含 "IP68" 和 "非水下"
+                            bool containsIP68 = cpxxBox.Text.Contains("IP68");
+                            bool containsNonUnderwater = cpxxBox.Text.Contains("非水下");
+
+
+                            if (标签种类_comboBox.Text == "品名标")
+                            {
+                                // 检查cpxxBox文本中是否包含"非水下方案"
+                                if (cpxxBox.Text.Contains("非水下方案"))
+                                {
+                                    // 如果包含"非水下方案"，则设置labelFormat的"SX"子字符串为"Not suitable for underwater use"
+                                    labelFormat.SubStrings.SetSubString("SX", "Not suitable for underwater use");
+                                }
+                                else
+                                {
+                                    // 否则，将"SX"子字符串设置为空字符串
+                                    labelFormat.SubStrings.SetSubString("SX", " ");
+                                }
+
+                            }
+                            else
+                            {
+                                if (comboBox_标签规格.Text.Contains("水下"))
+                                {
+                                    labelFormat.SubStrings.SetSubString("SX", "空.png");
+                                }
+                                else
+                                {
+                                    labelFormat.SubStrings.SetSubString("SX", containsIP68 && containsNonUnderwater ? "非水下.png" : "正常.png");
+                                }
+
+                            }
+                        }
+
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("修改内容出错 " + ex.Message, "操作提示");
+                        }
+
+                        //生成预览图
+                        pictureBox.Image = null;
+                        if (labelFormat != null)
+                        {
+                            //MessageBox.Show(_bmp_path, "操作提示");
+                            //Generate a thumbnail for it.
+                            labelFormat.ExportImageToFile(_bmp_path, ImageType.BMP, Seagull.BarTender.Print.ColorDepth.ColorDepth24bit, new Resolution(407, 407), OverwriteOptions.Overwrite);
+                            System.Drawing.Image image = System.Drawing.Image.FromFile(_bmp_path);
+                            Bitmap NmpImage = new Bitmap(image);
+                            pictureBox.Image = NmpImage;
+                            image.Dispose();
+
+                        }
+                        else
+                        {
+                            MessageBox.Show("生成图片错误", "操作提示");
+                        }
+
+                        if (isPreView) return;
+
+
+
+                        // 确保打印机已选择
+                        if (_PrinterName == "")
+                        {
+                            MessageBox.Show("请先选择打印机。");
+                            return;
+                        }
+
+                        //读取excel文件必须增加声明才能运行正常
+                        ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+
+                        if (!string.IsNullOrEmpty(Box_数据库.Text))
+                        {
+                            // 确保filePath是有效的Excel文件路径
+                            string filePath = Box_数据库.Text;
+                            // 使用EPPlus打开Excel文件
+                            using (var package = new ExcelPackage(new FileInfo(filePath)))
+                            {
+                                // 读取工作表
+                                var worksheet = package.Workbook.Worksheets[0];
+
+                                // 从第二行开始遍历，假设第一行是标题行
+                                for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+                                {
+                                    // 读取每列的数据
+                                    var aData = worksheet.Cells[row, 1].Value?.ToString() ?? string.Empty;
+                                    var bData = worksheet.Cells[row, 2].Value?.ToString() ?? string.Empty;
+                                    var cData = worksheet.Cells[row, 3].Value?.ToString() ?? string.Empty;
+                                    var dData = worksheet.Cells[row, 4].Value?.ToString() ?? string.Empty;
+                                    var eData = worksheet.Cells[row, 5].Value?.ToString() ?? string.Empty;
+                                    var fData = worksheet.Cells[row, 6].Value?.ToString() ?? string.Empty;
+                                    var gData = worksheet.Cells[row, 7].Value?.ToString() ?? string.Empty;
+                                    var hData = worksheet.Cells[row, 8].Value?.ToString() ?? string.Empty;
+                                    var iData = worksheet.Cells[row, 9].Value?.ToString() ?? string.Empty;
+
+
+
+                                    if (_wjm_ == "1.btw")
+                                    {
+                                        // 检查labelFormat是否已初始化
+                                        if (labelFormat != null)
+                                        {
+                                            // 使用读取的数据设置labelFormat的子字符串
+                                            labelFormat.SubStrings.SetSubString("XLH", aData);
+                                            labelFormat.SubStrings.SetSubString("BSM-01", bData);
+                                            labelFormat.SubStrings.SetSubString("BSM-02", cData);
+                                            textBox1.Text = gData; // 假设textBox1是WinForms的TextBox控件
+                                            //labelFormat.SubStrings.SetSubString("CPCD", hData);
+                                            name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, hData);
+                                            labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+
+                                            //高压情况
+                                            if (comboBox_标签规格.Text.Contains("高压"))
+                                            {
+                                                double.TryParse(hData, out double length); double result = length * 3.28; labelFormat.SubStrings.SetSubString("CPCD-2", result.ToString());
+                                                double washu = length * 10; double anpai = length * 0.093; labelFormat.SubStrings.SetSubString("CPXX-2", washu.ToString() + "W," + anpai.ToString() + "A");
+                                            }
+
+                                            labelFormat.SubStrings.SetSubString("CPCD", " ");
+
+                                            //客户型号被选择时
+                                            if (checkBox_客户型号.Checked)
+                                            {
+                                                //output_灯带型号 = "ART. No.: " + iData;
+                                                int ai = iData.Length;
+                                                if (ai <= 19) { output_灯带型号 = "ART. No.: " + iData; }
+                                                else if (ai > 19 && ai <= 27) { output_灯带型号 = "ART. No.: " + Environment.NewLine + iData; }
+                                                else { output_灯带型号 = "ART. No.: " + iData.Substring(0, 19) + Environment.NewLine + iData.Substring(19); }
+                                                name_CPXXBox.Text = output_name + "\n" + output_灯带型号 + "\n" + output_电压 + "\n" + output_功率 + "\n" + output_灯数 + "\n" + output_剪切单元 + "\n" + output_长度 + "\n" + output_色温 + "\n" + output_尾巴;
+                                                name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, hData);
+                                                labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+                                            }
+
+                                            // 设置打印机名称
+                                            labelFormat.PrintSetup.PrinterName = _PrinterName;
+
+                                            // 执行打印操作
+                                            int 次数 = Convert.ToInt32(textBox1.Text);
+
+                                            labelFormat.PrintSetup.PrinterName = _PrinterName;
+                                            for (int i = 0; i < 次数; i++)
+                                            {
+                                                labelFormat.Print("BarPrint" + DateTime.Now, 300);
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            MessageBox.Show("标签格式未初始化。");
+                                            break; // 如果labelFormat未初始化，退出循环
+                                        }
+                                    }
+                                    if (_wjm_ == "3.btw")
+                                    {
+                                        // 检查labelFormat是否已初始化
+                                        if (labelFormat != null)
+                                        {
+                                            // 使用读取的数据设置labelFormat的子字符串
+                                            labelFormat.SubStrings.SetSubString("XLH", aData);
+                                            labelFormat.SubStrings.SetSubString("BSM-01", bData);
+                                            labelFormat.SubStrings.SetSubString("BSM-02", cData);
+                                            labelFormat.SubStrings.SetSubString("BSM-03", dData);
+                                            textBox1.Text = gData; // 假设textBox1是WinForms的TextBox控件
+                                            //labelFormat.SubStrings.SetSubString("CPCD", hData);
+                                            name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, hData);
+                                            labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+
+                                            //高压情况
+                                            if (comboBox_标签规格.Text.Contains("高压"))
+                                            {
+                                                double.TryParse(hData, out double length); double result = length * 3.28; labelFormat.SubStrings.SetSubString("CPCD-2", result.ToString());
+                                                double washu = length * 10; double anpai = length * 0.093; labelFormat.SubStrings.SetSubString("CPXX-2", washu.ToString() + "W," + anpai.ToString() + "A");
+                                            }
+
+                                            labelFormat.SubStrings.SetSubString("CPCD", " ");
+
+                                            //客户型号被选择时
+                                            if (checkBox_客户型号.Checked)
+                                            {
+                                                //output_灯带型号 = "ART. No.: " + iData;
+                                                int ai = iData.Length;
+                                                if (ai <= 19) { output_灯带型号 = "ART. No.: " + iData; }
+                                                else if (ai > 19 && ai <= 27) { output_灯带型号 = "ART. No.: " + Environment.NewLine + iData; }
+                                                else { output_灯带型号 = "ART. No.: " + iData.Substring(0, 19) + Environment.NewLine + iData.Substring(19); }
+                                                name_CPXXBox.Text = output_name + "\n" + output_灯带型号 + "\n" + output_电压 + "\n" + output_功率 + "\n" + output_灯数 + "\n" + output_剪切单元 + "\n" + output_长度 + "\n" + output_色温 + "\n" + output_尾巴;
+                                                name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, hData);
+                                                labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+                                            }
+
+                                            // 设置打印机名称
+                                            labelFormat.PrintSetup.PrinterName = _PrinterName;
+
+                                            // 执行打印操作
+                                            int 次数 = Convert.ToInt32(textBox1.Text);
+
+                                            labelFormat.PrintSetup.PrinterName = _PrinterName;
+                                            for (int i = 0; i < 次数; i++)
+                                            {
+                                                labelFormat.Print("BarPrint" + DateTime.Now, 300);
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            MessageBox.Show("标签格式未初始化。");
+                                            break; // 如果labelFormat未初始化，退出循环
+                                        }
+                                    }
+                                    if (_wjm_ == "4.btw")
+                                    {
+                                        // 检查labelFormat是否已初始化
+                                        if (labelFormat != null)
+                                        {
+                                            // 使用读取的数据设置labelFormat的子字符串
+                                            labelFormat.SubStrings.SetSubString("XLH", aData);
+                                            labelFormat.SubStrings.SetSubString("BSM-01", bData);
+                                            labelFormat.SubStrings.SetSubString("BSM-02", cData);
+                                            labelFormat.SubStrings.SetSubString("BSM-03", dData);
+                                            labelFormat.SubStrings.SetSubString("BSM-04", eData);
+                                            textBox1.Text = gData; // 假设textBox1是WinForms的TextBox控件
+                                            //labelFormat.SubStrings.SetSubString("CPCD", hData);
+                                            name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, hData);
+                                            labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+
+                                            labelFormat.SubStrings.SetSubString("CPCD", " ");
+
+                                            //客户型号被选择时
+                                            if (checkBox_客户型号.Checked)
+                                            {
+                                                //output_灯带型号 = "ART. No.: " + iData;
+                                                int ai = iData.Length;
+                                                if (ai <= 19) { output_灯带型号 = "ART. No.: " + iData; }
+                                                else if (ai > 19 && ai <= 27) { output_灯带型号 = "ART. No.: " + Environment.NewLine + iData; }
+                                                else { output_灯带型号 = "ART. No.: " + iData.Substring(0, 19) + Environment.NewLine + iData.Substring(19); }
+                                                name_CPXXBox.Text = output_name + "\n" + output_灯带型号 + "\n" + output_电压 + "\n" + output_功率 + "\n" + output_灯数 + "\n" + output_剪切单元 + "\n" + output_长度 + "\n" + output_色温 + "\n" + output_尾巴;
+                                                name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, hData);
+                                                labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+                                            }
+
+                                            // 设置打印机名称
+                                            labelFormat.PrintSetup.PrinterName = _PrinterName;
+
+                                            // 执行打印操作
+                                            int 次数 = Convert.ToInt32(textBox1.Text);
+
+                                            labelFormat.PrintSetup.PrinterName = _PrinterName;
+                                            for (int i = 0; i < 次数; i++)
+                                            {
+                                                labelFormat.Print("BarPrint" + DateTime.Now, 300);
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            MessageBox.Show("标签格式未初始化。");
+                                            break; // 如果labelFormat未初始化，退出循环
+                                        }
+                                    }
+                                    if (_wjm_ == "5.btw")
+                                    {
+                                        // 检查labelFormat是否已初始化
+                                        if (labelFormat != null)
+                                        {
+                                            // 使用读取的数据设置labelFormat的子字符串
+                                            labelFormat.SubStrings.SetSubString("XLH", aData);
+                                            labelFormat.SubStrings.SetSubString("BSM-01", bData);
+                                            labelFormat.SubStrings.SetSubString("BSM-02", cData);
+                                            labelFormat.SubStrings.SetSubString("BSM-03", dData);
+                                            labelFormat.SubStrings.SetSubString("BSM-04", eData);
+                                            labelFormat.SubStrings.SetSubString("BSM-05", fData);
+                                            textBox1.Text = gData; // 假设textBox1是WinForms的TextBox控件
+                                            //labelFormat.SubStrings.SetSubString("CPCD", hData);
+                                            name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, hData);
+                                            labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+
+                                            labelFormat.SubStrings.SetSubString("CPCD", " ");
+
+                                            //客户型号被选择时
+                                            if (checkBox_客户型号.Checked)
+                                            {
+                                                //output_灯带型号 = "ART. No.: " + iData;
+                                                int ai = iData.Length;
+                                                if (ai <= 19) { output_灯带型号 = "ART. No.: " + iData; }
+                                                else if (ai > 19 && ai <= 27) { output_灯带型号 = "ART. No.: " + Environment.NewLine + iData; }
+                                                else { output_灯带型号 = "ART. No.: " + iData.Substring(0, 19) + Environment.NewLine + iData.Substring(19); }
+                                                name_CPXXBox.Text = output_name + "\n" + output_灯带型号 + "\n" + output_电压 + "\n" + output_功率 + "\n" + output_灯数 + "\n" + output_剪切单元 + "\n" + output_长度 + "\n" + output_色温 + "\n" + output_尾巴;
+                                                name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, hData);
+                                                labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+                                            }
+
+                                            // 设置打印机名称
+                                            labelFormat.PrintSetup.PrinterName = _PrinterName;
+
+                                            // 执行打印操作
+                                            int 次数 = Convert.ToInt32(textBox1.Text);
+
+                                            labelFormat.PrintSetup.PrinterName = _PrinterName;
+                                            for (int i = 0; i < 次数; i++)
+                                            {
+                                                labelFormat.Print("BarPrint" + DateTime.Now, 300);
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            MessageBox.Show("标签格式未初始化。");
+                                            break; // 如果labelFormat未初始化，退出循环
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            // 设置打印机名称
+                            labelFormat.PrintSetup.PrinterName = _PrinterName;
+
+                            // 执行打印操作
+                            int 次数 = Convert.ToInt32(textBox1.Text);
+
+                            labelFormat.PrintSetup.PrinterName = _PrinterName;
+                            for (int i = 0; i < 次数; i++)
+                            {
+                                labelFormat.Print("BarPrint" + DateTime.Now, 300);
+                            }
+                        }
+
+                    }
+
+
+
+
                 }
 
 
-                
+
+
             }
+            if (标签种类_comboBox.Text == "唛头")
+            {
+
+
+                唛头 mt = new 唛头();
+                mt.正常型号判断(cpxxBox.Text, checkBox_客户Name.Checked, checkBox_客户型号.Checked, textBox_客户资料.Text, comboBox_标签规格.Text, 标签种类_comboBox.Text, textBox_唛头数量.Text, textBox_唛头尺寸.Text);
+                using (Engine btEngine = new Engine(true))
+                {
+                    if (!_btw_path.Contains(comboBox_标签规格.Text))
+                    {
+                        _btw_path = _btw_path + comboBox_标签规格.Text; // 如果不包含，则拼接
+                    }
+
+                    //寻找文件名_单字匹配("正弯", "侧弯");
+                    string 复选框 = 判断复选框内容(cpxxBox.Text, comboBox_标签规格.Text);
+
+                    模板地址 = _btw_path + @"\" + _wjm_;
+                    //MessageBox.Show(模板地址, "操作提示");
+                    模板地址 = 模板地址.Replace("\n", "").Replace("\r", "");  //去除换行符，否则下面会报错
+
+                    if (_wjm_.Length > 2)
+                    { 
+                        LabelFormatDocument labelFormat = btEngine.Documents.Open(模板地址);
+
+                        name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, textBox_剪切长度.Text);
+                        labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text );
+                        //labelFormat.SubStrings.SetSubString("CPCD", textBox_剪切长度.Text);
+                        //高压情况
+                        if (comboBox_标签规格.Text.Contains("高压"))
+                        {
+                            double.TryParse(textBox_剪切长度.Text, out double length); double result = length * 3.28; labelFormat.SubStrings.SetSubString("CPCD-2", result.ToString());
+                            double washu = length * 10; double anpai = length * 0.093; labelFormat.SubStrings.SetSubString("CPXX-2", washu.ToString() + "W," + anpai.ToString() + "A");
+                        }
+
+                        labelFormat.SubStrings.SetSubString("CPCD", " ");
+                        labelFormat.SubStrings.SetSubString("FXK", 复选框);
+                        labelFormat.SubStrings.SetSubString("XLH", " ");
+
+
+                    }
+
+                }
+
+            }
+
         }
 
-        private void print_btn_Click(object sender, EventArgs e)
+            
+    
+
+        //判断复选框内容
+        private static string 判断复选框内容(string input,string 标签规格)
         {
-            PrintBar();
+            
+            bool hasConstantCurrent = input.Contains("恒流");
+            bool hasConstantVoltage = !hasConstantCurrent; // 如果没有恒流，则默认为恒压
+
+            string firstField = hasConstantCurrent ? "恒流" : "恒压";
+
+            // 检查是否有正弯或侧弯
+            bool hasPositiveBend = input.Contains("正弯");
+            bool hasSideBend = input.Contains("侧弯");
+
+            string secondField = hasPositiveBend ? "正弯" : (hasSideBend ? "侧弯" : "");
+
+           
+            // 检查comboBox_标签规格的当前选择项目文本中是否包含"RCM"
+            if (标签规格.Contains("RCM"))
+            {
+                
+                // 如果包含"RCM"，检查output_灯带型号的文本
+                var models = new[] { "F10", "F11", "F15", "F21", "F2222" }; // 这里可以添加或修改型号列表
+                bool isSideBend = models.Any(model => input.Contains(model));
+
+                // 如果是特定的型号，则默认为侧弯
+                if (isSideBend)
+                {
+                    secondField = "侧弯";
+                }
+                else
+                {
+                    secondField = "正弯"; // 其他的都是正弯
+                }
+
+                // 构建结果
+                return $"{firstField}-{secondField}.png";
+            }
+            else
+            {
+                // 构建结果
+                if (!string.IsNullOrEmpty(secondField))
+                {
+                    return $"{firstField}-{secondField}.png";
+                }
+                else
+                {
+                    return $"{firstField}.png";
+                }
+
+            }
+
+
+
         }
 
-        private void preview_btn_Click(object sender, EventArgs e)
-        {
-            PrintBar(true);
-        }
 
-        private void label2_Click(object sender, EventArgs e)
-        {
 
-        }
 
-        private void name_textBox_TextChanged(object sender, EventArgs e)
-        {
-
-        }
 
         //判断产品信息
         private void 判断产品信息(string aa)
         {
-            string output = "";
-            string output_name = "Name:"+Box_Name .Text ;
-            string output_灯带型号 = "";
-            string output_电压 = "";
-            string output_功率 = "";
-            string output_灯数 = "";
-            string output_剪切单元 = "";
-            string output_长度 = "Length:";
-            string output_色温 = "";
-            string output_尾巴 = "Made in China";
+
+            
 
 
 
             // 正则表达式模式，
             string pattern1 = @"^(\w+-\w+-\w+)";
             string pattern2 = @"D(\d+)V";
-            string pattern3 = @"额定功率(\d+)W";
+            //string pattern3 = @"额定功率(\d+)W";
+            string pattern3 = @"额定功率(\d+(?:\.\d+)?)W";
             string pattern4 = @"-(\d+)-";
             string pattern5 = @"(\d+)灯\/(\d+\.?\d*)cm";
-            string pattern6 = @"-IP(\d+)-";
+            string pattern6 = @"-IP(\d{2})";
 
 
             // 使用“-”字符分割输入字符串
@@ -464,7 +1300,7 @@ namespace BarTender_Dev_Dome
             {
                 // 构造输出字符串
                 string artNo = match1.Groups[1].Value; // 第一个括号匹配的内容
-                output_灯带型号 = $"ART. No.: {artNo}";
+                //output_灯带型号 = $"ART. No.: {artNo}";
 
                 // 使用信息框输出结果
                 //MessageBox.Show(output1, "提取结果");
@@ -476,18 +1312,55 @@ namespace BarTender_Dev_Dome
                 string originalString = textBox_客户资料.Text;
                 int spaceIndex = originalString.LastIndexOf('	');
 
+                int textLength = textBox_客户资料.Text.Length;
 
                 if (isCustomerNameChecked && !isCustomerModelChecked)
                 {
                     // 如果只有 checkBox_客户Name 被选中，则输出 1
                     //MessageBox.Show("1");
-                    output_name = "Name:" + textBox_客户资料.Text;
+                    //output_name = "Name:" + textBox_客户资料.Text;
+                    if (textLength <= 19)
+                    {
+                        // 如果长度在19以内
+                        output_name = "Name: " + textBox_客户资料.Text;
+                    }
+                    else if (textLength > 19 && textLength <= 27)
+                    {
+                        // 如果长度大于19，小于27
+                        // 在第20个字符的位置插入换行符
+                        output_name = "Name: " + Environment.NewLine + textBox_客户资料.Text;
+                    }
+                    else
+                    {
+                        // 如果长度大于27
+                        // 取前19个字符，然后加上剩余的字符
+                        output_name = "Name: " + textBox_客户资料.Text.Substring(0, 19) +Environment.NewLine +textBox_客户资料.Text.Substring(19);
+                    }
+
                 }
                 else if (!isCustomerNameChecked && isCustomerModelChecked)
                 {
                     // 如果只有 checkBox_客户型号 被选中，则输出 2
                     //MessageBox.Show("2");
-                    output_灯带型号 = "ART. No.: " + textBox_客户资料.Text;
+                    //output_灯带型号 = "ART. No.: " + textBox_客户资料.Text;   
+                    if (textLength <= 19)
+                    {
+                        // 如果长度在19以内
+                        output_灯带型号 = "ART. No.: " + textBox_客户资料.Text;
+                    }
+                    else if (textLength > 19 && textLength <= 27)
+                    {
+                        // 如果长度大于19，小于27
+                        // 在第20个字符的位置插入换行符
+                        output_灯带型号 = "ART. No.: " + Environment.NewLine + textBox_客户资料.Text;
+                    }
+                    else
+                    {
+                        // 如果长度大于27
+                        // 取前19个字符，然后加上剩余的字符
+                        output_灯带型号 = "ART. No.: " + textBox_客户资料.Text.Substring(0, 19) + Environment.NewLine + textBox_客户资料.Text.Substring(19);
+                    }
+
                 }
                 else if (isCustomerNameChecked && isCustomerModelChecked)
                 {
@@ -498,9 +1371,27 @@ namespace BarTender_Dev_Dome
                     {
                         string part1 = originalString.Substring(0, tabIndex);
                         string part2 = originalString.Substring(tabIndex + 1);
+                        int a1 = part1.Length;
+                        int a2 = part2.Length;
                         //MessageBox.Show(part1 + "\n" + part2);
-                        output_name = "Name:" + part1 ;
-                        output_灯带型号 = "ART. No.: " + part2 ;
+                        //output_name = "Name: " + part1 ;
+                        //output_灯带型号 = "ART. No.: " + part2 ;
+                        if (a1 <= 19)
+                        {
+                            output_name = "Name: " + part1;
+                        }
+                        else if (a1 > 19 && a1 <= 27)
+                        {
+                            output_name = "Name: " + Environment.NewLine + part1;
+                        }
+                        else
+                        {
+                            output_name = "Name: " + part1.Substring(0, 19) + Environment.NewLine + part1.Substring(19);
+                        }
+                        if (a2 <= 19) { output_灯带型号 = "ART. No.: " + part2; }
+                        else if (a2 > 19 && a2 <= 27) { output_灯带型号 = "ART. No.: " + Environment.NewLine + part2; }
+                        else { output_灯带型号 = "ART. No.: " + part2.Substring(0, 19) + Environment.NewLine + part2.Substring(19);}
+
 
                     }
                     else
@@ -513,8 +1404,33 @@ namespace BarTender_Dev_Dome
                     // 如果两个复选框都没有被选中，则直接显示原始字符串
                     //MessageBox.Show(originalString);
                     output_name = "Name:LED Flex Linear Light";
-                    output_灯带型号 = $"ART. No.: {artNo}";
+                    //output_灯带型号 = $"ART. No.: {artNo}";
+                    int a4 = artNo.Length;
+                    if (a4 <= 19)
+                    {
+                        output_灯带型号 = "ART. No.: " + artNo;
+                    }
+                    else if (a4 > 19 && a4 <= 27)
+                    {
+                        output_灯带型号 = "ART. No.: " + Environment.NewLine + artNo;
+                    }
+                    else
+                    {
+                        output_灯带型号 = "ART. No.: " + artNo.Substring(0, 19) + Environment.NewLine + artNo.Substring(19);
+                    }
+
                 }
+
+                string lightModel = output_灯带型号;
+                // 获取最后一个字符
+                char lastChar = lightModel[lightModel.Length - 1];
+                // 是否为字母
+                if (char.IsLetter(lastChar))
+                {
+                    灯带系列 = lastChar.ToString();
+                    //MessageBox.Show(灯带系列);
+                }
+
 
             }
             else
@@ -529,8 +1445,17 @@ namespace BarTender_Dev_Dome
                 // 从匹配结果中提取电压值
                 string voltageValue = match2.Groups[1].Value; // 第一个捕获组匹配的内容
 
-                // 构造输出字符串
-                output_电压 = $"Rated Voltage: {voltageValue}V";
+                // 检查 comboBox_标签规格.Text 的内容中是否包含“高压”这两个字
+                if (comboBox_标签规格.Text.Contains("高压"))
+                {
+                    // 如果包含“高压”，则设置 output_电压 为 AC
+                    output_电压 = $"Rated Voltage: AC {voltageValue}V";
+                }
+                else
+                {
+                    // 如果不包含“高压”，则设置 output_电压 为 DC
+                    output_电压 = $"Rated Voltage: DC {voltageValue}V";
+                }
 
                 // 使用信息框输出结果
                 //MessageBox.Show(output2, "提取结果");
@@ -577,7 +1502,15 @@ namespace BarTender_Dev_Dome
                 string length = match5.Groups[2].Value; // 第二个捕获组匹配的内容，如 "5.56"
 
                 // 构造输出字符串
-                output_剪切单元 = $"Min. Cutting Length: {ledQuantity}LEDs\n({length}cm)";
+                //output_剪切单元 = $"Min. Cutting Length: {ledQuantity}LEDs\n({length}cm)";
+                if (标签种类_comboBox.Text == "品名标")
+                {
+                    output_剪切单元 = $"Min. Cutting Length: {ledQuantity}LEDs({length}cm)";
+                }
+                else
+                {
+                    output_剪切单元 = $"Min. Cutting Length: {ledQuantity}LEDs\n({length}cm)";
+                }
             }
             else
             {
@@ -589,22 +1522,64 @@ namespace BarTender_Dev_Dome
             // 色温
             if (parts.Length >= 6)
             {
+                string numericValue;
                 // 第五个"-"和第六个"-"之间的内容是parts[5]，因为数组索引是从0开始的
                 string contentBetweenFifthAndSixth = parts[5];
 
+              
 
-
-                // 检查内容是否为纯字母
-                if (Regex.IsMatch(contentBetweenFifthAndSixth, @"^[a-zA-Z]*$"))
+                // 检查灯带系列是否为"S"或"D"
+                string series = 灯带系列; 
+                if (series.Equals("S") || series.Equals("E"))
                 {
-                    output_色温 = $"Color: {contentBetweenFifthAndSixth}";
+
+                    // 如果灯带系列是"S"或"D"，执行新的逻辑
+
+                    output_色温 = $"Color: {contentBetweenFifthAndSixth}";// 示例，表示输出所有色温内容
+
                 }
                 else
                 {
-                    // 如果包含字母，则提取数字部分
-                    string numericValue = Regex.Replace(contentBetweenFifthAndSixth, @"[^0-9]", "");
-                    output_色温 = $"Color: {numericValue}K";
+                    // 如果灯带系列是"S"或"D"，按照现有逻辑判断色温
+                    // 检查内容是否为纯字母
+                    if (Regex.IsMatch(contentBetweenFifthAndSixth, @"^[a-zA-Z]*$"))
+                    {
+                        output_色温 = $"Color: {contentBetweenFifthAndSixth}";
+                    }
+                    else
+                    {
+                        // 如果包含数字，则提取数字部分
+                        numericValue = Regex.Replace(contentBetweenFifthAndSixth, @"[^0-9]", "");
+                        output_色温 = $"Color: {numericValue}K";
+                    }
                 }
+
+                // 检查 "全彩" 是否存在于 cpxxBox.Text 中
+                bool containsFullColor = cpxxBox.Text.Contains("全彩");
+                
+
+                if (contentBetweenFifthAndSixth == "R" && containsFullColor) { output_色温 = $"Color: Red(Full color jacket)"; }
+                else if(contentBetweenFifthAndSixth == "R" && ! containsFullColor) { output_色温 = $"Color: Red"; }
+                else if (contentBetweenFifthAndSixth == "B" && containsFullColor) { output_色温 = $"Color: Blue(Full color jacket)"; }
+                else if (contentBetweenFifthAndSixth == "B" && !containsFullColor) { output_色温 = $"Color: Blue"; }
+                else if (contentBetweenFifthAndSixth == "G" && containsFullColor) { output_色温 = $"Color: Green(Full color jacket)"; }
+                else if (contentBetweenFifthAndSixth == "G" && !containsFullColor) { output_色温 = $"Color: Green"; }
+                else if (contentBetweenFifthAndSixth == "O" && containsFullColor) { output_色温 = $"Color: Orange(Full color jacket)"; }
+                else if (contentBetweenFifthAndSixth == "O" && !containsFullColor) { output_色温 = $"Color: Orange"; }
+                else if (contentBetweenFifthAndSixth == "Y" && containsFullColor) { output_色温 = $"Color: Yellow(Full color jacket)"; }
+                else if (contentBetweenFifthAndSixth == "Y" && !containsFullColor) { output_色温 = $"Color: Yellow"; }
+                else if (contentBetweenFifthAndSixth == "Y578" ) { output_色温 = $"Color: Yellow (Full color jacket) (Y578nm)"; }
+                else if (contentBetweenFifthAndSixth == "Y580" ) { output_色温 = $"Color: Yellow (Full color jacket) (Y580nm)"; }
+                else if (contentBetweenFifthAndSixth == "Y582" ) { output_色温 = $"Color: Yellow (Full color jacket) (Y582nm)"; }
+                else if (cpxxBox.Text.Contains("黑色遮光+雾面发光") ) { output_色温 = $"Color: {Regex.Replace(contentBetweenFifthAndSixth, @"[^0-9]", "")}K(Black jacket)"; }
+                else if (cpxxBox.Text.Contains("黑色全彩") ) { output_色温 = $"Color: {Regex.Replace(contentBetweenFifthAndSixth, @"[^0-9]", "")}K(Full Black jacket)"; }
+                else if (cpxxBox.Text.Contains("白+暖白") ) { output_色温 = $"Color: Warm White+White"; }
+                else if (cpxxBox.Text.Contains("暖白+暖白") ) { output_色温 = $"Color: Warm White+Warm White"; }
+
+
+
+
+
 
             }
             else
@@ -616,10 +1591,22 @@ namespace BarTender_Dev_Dome
             if (match6.Success)
             {
                 // 从匹配结果中提取数字
-                string ipNumber = match6.Groups[1].Value; // 第一个捕获组匹配的内容
+                // string ipNumber = match6.Groups[1].Value; // 第一个捕获组匹配的内容
+                string result = FindMinimumIPNumber(cpxxBox.Text);
+                if (result != null)
+                {
+                    Console.WriteLine($"最小的IP等级数字是: {result}");
+                    bq_ipdj = $"IP{result}"; // 假设这是全局变量或在类中定义的属性
+                    Console.WriteLine($"bq_ipdj: {bq_ipdj}");
+                }
+                
 
-                // 构造输出字符串
-                bq_ipdj  = $"IP{ipNumber}";
+
+            }
+            else if (comboBox_标签规格.Text.Contains("直发") && 标签种类_comboBox.Text == "品名标")
+            {
+                bq_ipdj = "  ";
+
             }
             else
             {
@@ -627,7 +1614,15 @@ namespace BarTender_Dev_Dome
                 MessageBox.Show("未找到IP等级匹配项。", "错误");
             }
 
-
+            //判断尾巴Made in China
+            if (checkBox_结尾.Checked)
+            {
+                output_尾巴 =textBox_结尾.Text ;
+            }
+            else
+            {
+                output_尾巴 = " "; 
+            }
 
 
             //MessageBox.Show(output_name +"\n" + output_灯带型号 + "\n" + output_电压 + "\n" + output_功率 + "\n" + output_灯数 + "\n" + output_剪切单元 + "\n" + output_长度 + "\n" + output_色温 + "\n" + output_尾巴, "提取结果");
@@ -635,75 +1630,24 @@ namespace BarTender_Dev_Dome
 
         }
 
+        //判断-IP
+        private static string FindMinimumIPNumber(string text)
+        {
+            // 正则表达式，用于匹配 -IP 后面的数字
+            string pattern = @"-IP(\d{2})";
+            var matches = Regex.Matches(text, pattern);
 
+            if (matches.Count > 0)
+            {
+                // 转换为数字，找出最小值
+                int minIPNumber = matches.Cast<Match>().Select(m => int.Parse(m.Groups[1].Value)).Min();
+                return minIPNumber.ToString();
+            }
 
-        //链接excel数据
-        //private void button_数据库_Click(object sender, EventArgs e)
-        //{
-        //    ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;  //避免许可证错误
+            return null; // 如果没有找到任何匹配项，返回 null
+        }
 
-
-        //    OpenFileDialog dialog = new OpenFileDialog();
-        //    dialog.Multiselect = false;//多个文件
-        //    dialog.Title = "请选择数据库文件";
-        //    dialog.Filter = "excel文件(*.xlsx)|*.xlsx|All files (*.*)|*.*";
-        //    dialog.InitialDirectory = Application.StartupPath + @"\数据库";
-
-        //    if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-        //    {
-        //        _sjk_path = dialog.FileName;
-        //        Box_数据库 .Text = dialog.FileName;
-        //        // fileNametBox.Text = dialog.SafeFileName;
-        //        Box_数据库.BackColor = System.Drawing.Color.LightGreen;
-
-        //        try
-        //        {
-        //            // 加载Excel文件
-        //            using (var package = new ExcelPackage(new FileInfo(_sjk_path)))
-        //            {
-        //                // 获取工作表
-        //                var worksheet = package.Workbook.Worksheets["Sheet1"];
-
-        //                int row = 2;
-
-        //                while (worksheet.Cells[row, 1].Value != null)
-        //                {
-        //                    // 读取列单元格的值
-        //                    var cellValue1 = worksheet.Cells[row, 1].Value.ToString();
-        //                    var cellValue2 = worksheet.Cells[row, 2].Value.ToString();
-        //                    var cellValue3 = worksheet.Cells[row, 3].Value.ToString();
-        //                    var cellValue4 = worksheet.Cells[row, 4].Value.ToString();
-
-
-
-        //                    // 将读取的内容赋值给 TextBox 控件
-        //                    MessageBox.Show(cellValue1,"打印序列");  //不能删，删掉会卡死
-        //                    textBox_序号.Text = cellValue1;
-        //                    TextBox_sku.Text = cellValue2;
-        //                    textBox_type.Text = cellValue3;
-        //                    textBox_剪切长度.Text = cellValue4;
-
-        //                    // 等待10秒
-        //                    System.Threading.Thread.Sleep(60);
-
-        //                    // 移到下一行
-        //                    row++;
-        //                }
-
-
-
-        //            }
-
-
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            MessageBox.Show("无法读取Excel文件: " + ex.Message);
-        //        }
-
-
-        //    }
-        //}
+        //加载excel数据路径
         private async void button_数据库_Click_1(object sender, EventArgs e)
         {
             ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
@@ -720,56 +1664,24 @@ namespace BarTender_Dev_Dome
                 Box_数据库.Text = dialog.FileName;
                 Box_数据库.BackColor = System.Drawing.Color.LightGreen;
 
-                try
-                {
-                    // 加载Excel文件
-                    using (var package = new ExcelPackage(new FileInfo(_sjk_path)))
-                    {
-                        var worksheet = package.Workbook.Worksheets["Sheet1"];
-
-                        int row = 2;
-                        while (worksheet.Cells[row, 1].Value != null)
-                        {
-                            var cellValue1 = worksheet.Cells[row, 1].Value.ToString();
-                            var cellValue2 = worksheet.Cells[row, 2].Value.ToString();
-                            var cellValue3 = worksheet.Cells[row, 3].Value.ToString();
-                            var cellValue4 = worksheet.Cells[row, 4].Value.ToString();
-
-                            // 使用Task.Run来在后台线程处理数据读取
-                            await Task.Run(() =>
-                            {
-                                // 模拟数据处理延迟
-                                System.Threading.Thread.Sleep(1000);
-                            });
-
-                            // 使用Invoke确保UI更新在UI线程上执行
-                            this.Invoke((MethodInvoker)delegate
-                            {
-                                // 将读取的内容赋值给 TextBox 控件
-                                textBox_序号.Text = cellValue1;
-                                TextBox_sku.Text = cellValue2;
-                                textBox_type.Text = cellValue3;
-                                textBox_剪切长度.Text = cellValue4;
-                            });
-
-                            // 移到下一行
-                            row++;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("无法读取Excel文件: " + ex.Message);
-                }
+                
             }
+        }
+
+        //读取excel数据内容 
+        private void button_test_Click_2(object sender, EventArgs e)
+        {
+            //唛头 mt = new 唛头();
+            //mt.正常型号判断(cpxxBox.Text, checkBox_客户Name.Checked ,checkBox_客户型号.Checked ,textBox_客户资料.Text ,comboBox_标签规格.Text ,标签种类_comboBox.Text,textBox_唛头数量.Text ,textBox_唛头尺寸.Text );
+            int textLength = textBox_text.Text.Length;
+            MessageBox.Show("文本框中包含文本，长度为: " + textLength);
+            
+          
         }
 
 
 
-
-
-
-        private void 寻找文件名_单字匹配(string aa1,string aa2)
+    private void 寻找文件名_单字匹配(string aa1,string aa2)
         {
             // 检查文本中是否包含“aa1”或“aa2”
             bool containsPositiveBend = cpxxBox.Text.Contains(aa1);
@@ -819,15 +1731,357 @@ namespace BarTender_Dev_Dome
             {
                 using (Engine btEngine = new Engine(true))
                 {
+                    string 复选框 = 判断复选框内容(cpxxBox.Text, comboBox_标签规格.Text );
+
                     LabelFormatDocument labelFormat = btEngine.Documents.Open(模板地址);
                     //LabelFormatDocument labelFormat = btEngine.Documents.Open(@"E:\正在进行项目\经管中心-标签打印\python\BarTender_Dev_Dome-master\BarTender_Dev_Dome-master\BarTender_Dev_Dome\bin\Debug\moban\工字标\tesssst-正弯.btw");
                     try
                     {
+                        name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, textBox_剪切长度.Text);
                         labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
-                        labelFormat.SubStrings.SetSubString("CPCD", TextBox_sku.Text);
-                        labelFormat.SubStrings.SetSubString("IPDJ", bq_ipdj);
+                        //labelFormat.SubStrings.SetSubString("CPCD", textBox_剪切长度.Text);
+                        labelFormat.SubStrings.SetSubString("CPCD", " ");
+
+                        //高压情况
+                        if (comboBox_标签规格.Text.Contains("高压"))
+                        {
+                            double.TryParse(textBox_剪切长度.Text, out double length); double result = length * 3.28; labelFormat.SubStrings.SetSubString("CPCD-2", result.ToString());
+                            double washu = length * 10; double anpai = length * 0.093; labelFormat.SubStrings.SetSubString("CPXX-2", washu.ToString() + "W," + anpai.ToString() + "A");
+                        }
+
+                        //labelFormat.SubStrings.SetSubString("IPDJ", bq_ipdj);
+                        if (comboBox_标签规格.Text.Contains("水下"))
+                        {
+                            labelFormat.SubStrings.SetSubString("IPDJ", "IP68 5m");
+                        }
+                        else
+                        {
+                            labelFormat.SubStrings.SetSubString("IPDJ", bq_ipdj);
+                        }
+
+                        labelFormat.SubStrings.SetSubString("FXK", 复选框);
+                        labelFormat.SubStrings.SetSubString("XLH", " ");
+
+                        //写入2排标识码时候的内容
+                        //判断显指内容
+                        // 重置 XZ 字段的内容
+                        labelFormat.SubStrings.SetSubString("XZ", "");
+                        string BPrefixContent = string.Empty; // 用于存储 "B-" 前面的内容
+
+                        // 查找 "B-" 并获取它之前的所有内容
+                        int BIndex = cpxxBox.Text.IndexOf("\r\nB-");
+                        if (BIndex != -1 && BIndex > 0) // 确保 "B-" 存在且不是在字符串开头
+                        {
+                            BPrefixContent = cpxxBox.Text.Substring(0, BIndex).Trim();
+                        }
+                        //MessageBox.Show(BPrefixContent, "操作提示");
+                        // 检查是否存在 "Ra90" 或 "Ra95"
+                        bool containsRa90 = BPrefixContent.Contains("Ra90");
+                        bool containsRa95 = BPrefixContent.Contains("Ra95");
+
+                        if (BPrefixContent.Contains("三面发光"))
+                        {
+                            labelFormat.SubStrings.SetSubString("XZ", 灯带系列 + @"T");
+                            labelFormat.SubStrings.SetSubString("FXK-2", "实.png");
+                            labelFormat.SubStrings.SetSubString("XZ-2", " ");
+                            labelFormat.SubStrings.SetSubString("FXK-3", "空.png");
+                            // 如果同时存在DTW和Ra90或Ra95，设置额外的子字符串
+                            if (containsRa90 || containsRa95)
+                            {
+                                labelFormat.SubStrings.SetSubString("FXK-3", "实.png");
+                                string raValue = containsRa90 ? "Ra90" : (containsRa95 ? "Ra95" : "");
+                                labelFormat.SubStrings.SetSubString("XZ-2", raValue);
+                            }
+
+                        }
+                        else if (BPrefixContent.Contains("高亮"))
+                        {
+                            labelFormat.SubStrings.SetSubString("XZ", "BH");
+                            labelFormat.SubStrings.SetSubString("FXK-2", "实.png");
+                            labelFormat.SubStrings.SetSubString("XZ-2", " ");
+                            labelFormat.SubStrings.SetSubString("FXK-3", "空.png");
+                            // 如果同时存在DTW和Ra90或Ra95，设置额外的子字符串
+                            if (containsRa90 || containsRa95)
+                            {
+                                labelFormat.SubStrings.SetSubString("FXK-3", "实.png");
+                                string raValue = containsRa90 ? "Ra90" : (containsRa95 ? "Ra95" : "");
+                                labelFormat.SubStrings.SetSubString("XZ-2", raValue);
+                            }
+
+                        }
+                        else if (BPrefixContent.Contains("翻边"))
+                        {
+                            labelFormat.SubStrings.SetSubString("XZ", "BF");
+                            labelFormat.SubStrings.SetSubString("FXK-2", "实.png");
+                            labelFormat.SubStrings.SetSubString("XZ-2", " ");
+                            labelFormat.SubStrings.SetSubString("FXK-3", "空.png");
+                            // 如果同时存在DTW和Ra90或Ra95，设置额外的子字符串
+                            if (containsRa90 || containsRa95)
+                            {
+                                labelFormat.SubStrings.SetSubString("FXK-3", "实.png");
+                                string raValue = containsRa90 ? "Ra90" : (containsRa95 ? "Ra95" : "");
+                                labelFormat.SubStrings.SetSubString("XZ-2", raValue);
+                            }
+
+                        }
+                        else if (BPrefixContent.Contains("DTW"))
+                        {
+                            labelFormat.SubStrings.SetSubString("XZ", "DTW");
+                            labelFormat.SubStrings.SetSubString("FXK-2", "实.png");
+                            labelFormat.SubStrings.SetSubString("XZ-2", " ");
+                            labelFormat.SubStrings.SetSubString("FXK-3", "空.png");
+                            // 如果同时存在DTW和Ra90或Ra95，设置额外的子字符串
+                            if (containsRa90 || containsRa95)
+                            {
+                                labelFormat.SubStrings.SetSubString("FXK-3", "实.png");
+                                string raValue = containsRa90 ? "Ra90" : (containsRa95 ? "Ra95" : "");
+                                labelFormat.SubStrings.SetSubString("XZ-2", raValue);
+                            }
+
+                        }
+                        else if (灯带系列 == "D")
+                        {
+                            labelFormat.SubStrings.SetSubString("XZ", "D");
+                            labelFormat.SubStrings.SetSubString("FXK-2", "实.png");
+                            labelFormat.SubStrings.SetSubString("XZ-2", " ");
+                            labelFormat.SubStrings.SetSubString("FXK-3", "空.png");
+                            if (containsRa90 || containsRa95)
+                            {
+                                labelFormat.SubStrings.SetSubString("FXK-3", "实.png");
+                                string raValue = containsRa90 ? "Ra90" : (containsRa95 ? "Ra95" : "");
+                                labelFormat.SubStrings.SetSubString("XZ-2", raValue);
+                            }
+                        }
+                        else if (BPrefixContent.Contains("Ra90"))
+                        {
+                            labelFormat.SubStrings.SetSubString("XZ", "Ra90");
+                            labelFormat.SubStrings.SetSubString("FXK-2", "实.png");
+                            labelFormat.SubStrings.SetSubString("XZ-2", " ");
+                            labelFormat.SubStrings.SetSubString("FXK-3", "空.png");
+
+                        }
+                        else if (BPrefixContent.Contains("Ra95"))
+                        {
+                            labelFormat.SubStrings.SetSubString("XZ", "Ra95");
+                            labelFormat.SubStrings.SetSubString("FXK-2", "实.png");
+                            labelFormat.SubStrings.SetSubString("XZ-2", " ");
+                            labelFormat.SubStrings.SetSubString("FXK-3", "空.png");
+                        }
+                        else
+                        {
+                            // 如果没有找到上述任何关键字，则设置为空
+                            labelFormat.SubStrings.SetSubString("XZ", "");
+                            labelFormat.SubStrings.SetSubString("XZ-2", " ");
+                            labelFormat.SubStrings.SetSubString("FXK-2", "空.png");
+                            labelFormat.SubStrings.SetSubString("FXK-3", "空.png");
+                        }
+
+                        //检查是否为非水下内容
+                        // 检查 cpxxBox.Text 中是否同时包含 "IP68" 和 "非水下"
+                        bool containsIP68 = cpxxBox.Text.Contains("IP68");
+                        bool containsNonUnderwater = cpxxBox.Text.Contains("非水下");
+                        //labelFormat.SubStrings.SetSubString("SX", containsIP68 && containsNonUnderwater ? "非水下.png" : "正常.png");
+                        if (标签种类_comboBox.Text == "品名标")
+                        {
+                            // 检查cpxxBox文本中是否包含"非水下方案"
+                            if (cpxxBox.Text.Contains("非水下方案"))
+                            {
+                                // 如果包含"非水下方案"，则设置labelFormat的"SX"子字符串为"Not suitable for underwater use"
+                                labelFormat.SubStrings.SetSubString("SX", "Not suitable for underwater use");
+                            }
+                            else
+                            {
+                                // 否则，将"SX"子字符串设置为空字符串
+                                labelFormat.SubStrings.SetSubString("SX", " ");
+                            }
+
+                        }
+                        else
+                        {
+                            if (comboBox_标签规格.Text.Contains("水下"))
+                            {
+                                labelFormat.SubStrings.SetSubString("SX", "空.png");
+                            }
+                            else
+                            {
+                                labelFormat.SubStrings.SetSubString("SX", containsIP68 && containsNonUnderwater ? "非水下.png" : "正常.png");
+                            }
+
+                        }
 
 
+                        //判断是否增加标识码
+                        if (checkBox_标识码01.Checked)
+                        {
+                            labelFormat.SubStrings.SetSubString("BSM-01", textBox_标识码01.Text);
+                        }
+                        else
+                        {
+                            labelFormat.SubStrings.SetSubString("BSM-01", " ");
+                        }
+                        if (checkBox_标识码02.Checked)
+                        {
+                            labelFormat.SubStrings.SetSubString("BSM-02", textBox_标识码02.Text);
+                        }
+                        else
+                        {
+                            labelFormat.SubStrings.SetSubString("BSM-02", " ");
+                        }
+
+                        // 检查数据库地址不为空时
+                        if (!string.IsNullOrEmpty(Box_数据库.Text))
+                        {
+
+                            string b2Data, c2Data, g2Data, h2Data, a2Data, d2Data, e2Data, f2Data, i2Data;
+
+                            // 使用EPPlus打开Excel文件
+                            using (var package = new ExcelPackage(new FileInfo(Box_数据库.Text)))
+                            {
+                                // 假设Excel工作表名为"Sheet1"
+                                var worksheet = package.Workbook.Worksheets["Sheet1"];
+
+                                // 读取B2和C2单元格的数据
+                                a2Data = worksheet.Cells["A2"].Value?.ToString() ?? string.Empty;
+                                b2Data = worksheet.Cells["B2"].Value?.ToString() ?? string.Empty;
+                                c2Data = worksheet.Cells["C2"].Value?.ToString() ?? string.Empty;
+                                d2Data = worksheet.Cells["D2"].Value?.ToString() ?? string.Empty;
+                                e2Data = worksheet.Cells["E2"].Value?.ToString() ?? string.Empty;
+                                f2Data = worksheet.Cells["F2"].Value?.ToString() ?? string.Empty;
+                                g2Data = worksheet.Cells["G2"].Value?.ToString() ?? string.Empty;
+                                h2Data = worksheet.Cells["H2"].Value?.ToString() ?? string.Empty;
+                                i2Data = worksheet.Cells["I2"].Value?.ToString() ?? string.Empty;
+
+                            }
+
+                            switch (_wjm_)
+                            {
+                                case "1.btw":
+                                    labelFormat.SubStrings.SetSubString("XLH", a2Data);
+                                    labelFormat.SubStrings.SetSubString("BSM-01", b2Data);
+                                    labelFormat.SubStrings.SetSubString("BSM-02", c2Data);
+                                    textBox1.Text = g2Data;
+                                    //labelFormat.SubStrings.SetSubString("CPCD", h2Data);
+                                    name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, h2Data);
+                                    labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+
+                                    //高压情况
+                                    if (comboBox_标签规格.Text.Contains("高压"))
+                                    {
+                                        double.TryParse(h2Data, out double length); double result = length * 3.28; labelFormat.SubStrings.SetSubString("CPCD-2", result.ToString());
+                                        double washu = length * 10; double anpai = length * 0.093; labelFormat.SubStrings.SetSubString("CPXX-2", washu.ToString() + "W," + anpai.ToString() + "A");
+                                    }
+
+                                    labelFormat.SubStrings.SetSubString("CPCD", " ");
+
+                                    //客户型号被选择时
+                                    if (checkBox_客户型号.Checked)
+                                    {
+                                        //output_灯带型号 = "ART. No.: " + i2Data;
+                                        int ai = i2Data.Length;
+                                        if (ai <= 19) { output_灯带型号 = "ART. No.: " + i2Data; }
+                                        else if (ai > 19 && ai <= 27) { output_灯带型号 = "ART. No.: " + Environment.NewLine + i2Data; }
+                                        else { output_灯带型号 = "ART. No.: " + i2Data.Substring(0, 19) + Environment.NewLine + i2Data.Substring(19); }
+                                        name_CPXXBox.Text = output_name + "\n" + output_灯带型号 + "\n" + output_电压 + "\n" + output_功率 + "\n" + output_灯数 + "\n" + output_剪切单元 + "\n" + output_长度 + "\n" + output_色温 + "\n" + output_尾巴;
+                                        name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, h2Data);
+                                        labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+                                    }
+
+                                    break;
+                                case "3.btw":
+                                    labelFormat.SubStrings.SetSubString("XLH", a2Data);
+                                    labelFormat.SubStrings.SetSubString("BSM-01", b2Data);
+                                    labelFormat.SubStrings.SetSubString("BSM-02", c2Data);
+                                    labelFormat.SubStrings.SetSubString("BSM-03", d2Data);
+                                    textBox1.Text = g2Data;
+                                    //labelFormat.SubStrings.SetSubString("CPCD", h2Data);
+                                    name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, h2Data);
+                                    labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+
+                                    //高压情况
+                                    if (comboBox_标签规格.Text.Contains("高压"))
+                                    {
+                                        double.TryParse(h2Data, out double length); double result = length * 3.28; labelFormat.SubStrings.SetSubString("CPCD-2", result.ToString());
+                                        double washu = length * 10; double anpai = length * 0.093; labelFormat.SubStrings.SetSubString("CPXX-2", washu.ToString() + "W," + anpai.ToString() + "A");
+                                    }
+
+                                    labelFormat.SubStrings.SetSubString("CPCD", " ");
+
+                                    //客户型号被选择时
+                                    if (checkBox_客户型号.Checked)
+                                    {
+                                        //output_灯带型号 = "ART. No.: " + i2Data;
+                                        int ai = i2Data.Length;
+                                        if (ai <= 19) { output_灯带型号 = "ART. No.: " + i2Data; }
+                                        else if (ai > 19 && ai <= 27) { output_灯带型号 = "ART. No.: " + Environment.NewLine + i2Data; }
+                                        else { output_灯带型号 = "ART. No.: " + i2Data.Substring(0, 19) + Environment.NewLine + i2Data.Substring(19); }
+                                        name_CPXXBox.Text = output_name + "\n" + output_灯带型号 + "\n" + output_电压 + "\n" + output_功率 + "\n" + output_灯数 + "\n" + output_剪切单元 + "\n" + output_长度 + "\n" + output_色温 + "\n" + output_尾巴;
+                                        name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, h2Data);
+                                        labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+                                    }
+
+                                    break;
+                                case "4.btw":
+                                    labelFormat.SubStrings.SetSubString("XLH", a2Data);
+                                    labelFormat.SubStrings.SetSubString("BSM-01", b2Data);
+                                    labelFormat.SubStrings.SetSubString("BSM-02", c2Data);
+                                    labelFormat.SubStrings.SetSubString("BSM-03", d2Data);
+                                    labelFormat.SubStrings.SetSubString("BSM-04", e2Data);
+                                    textBox1.Text = g2Data;
+                                    //labelFormat.SubStrings.SetSubString("CPCD", h2Data);
+                                    name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, h2Data);
+                                    labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+
+                                    labelFormat.SubStrings.SetSubString("CPCD", " ");
+
+                                    //客户型号被选择时
+                                    if (checkBox_客户型号.Checked)
+                                    {
+                                        //output_灯带型号 = "ART. No.: " + i2Data;
+                                        int ai = i2Data.Length;
+                                        if (ai <= 19) { output_灯带型号 = "ART. No.: " + i2Data; }
+                                        else if (ai > 19 && ai <= 27) { output_灯带型号 = "ART. No.: " + Environment.NewLine + i2Data; }
+                                        else { output_灯带型号 = "ART. No.: " + i2Data.Substring(0, 19) + Environment.NewLine + i2Data.Substring(19); }
+                                        name_CPXXBox.Text = output_name + "\n" + output_灯带型号 + "\n" + output_电压 + "\n" + output_功率 + "\n" + output_灯数 + "\n" + output_剪切单元 + "\n" + output_长度 + "\n" + output_色温 + "\n" + output_尾巴;
+                                        name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text,h2Data);
+                                        labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+                                    }
+
+                                    break;
+                                case "5.btw":
+                                    labelFormat.SubStrings.SetSubString("XLH", a2Data);
+                                    labelFormat.SubStrings.SetSubString("BSM-01", b2Data);
+                                    labelFormat.SubStrings.SetSubString("BSM-02", c2Data);
+                                    labelFormat.SubStrings.SetSubString("BSM-03", d2Data);
+                                    labelFormat.SubStrings.SetSubString("BSM-04", e2Data);
+                                    labelFormat.SubStrings.SetSubString("BSM-05", f2Data);
+                                    textBox1.Text = g2Data;
+                                    //labelFormat.SubStrings.SetSubString("CPCD", h2Data);
+                                    name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, h2Data);
+                                    labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+
+                                    labelFormat.SubStrings.SetSubString("CPCD", " ");
+
+                                    //客户型号被选择时
+                                    if (checkBox_客户型号.Checked)
+                                    {
+                                        //output_灯带型号 = "ART. No.: " + i2Data;
+                                        int ai = i2Data.Length;
+                                        if (ai <= 19) { output_灯带型号 = "ART. No.: " + i2Data; }
+                                        else if (ai > 19 && ai <= 27) { output_灯带型号 = "ART. No.: " + Environment.NewLine + i2Data; }
+                                        else { output_灯带型号 = "ART. No.: " + i2Data.Substring(0, 19) + Environment.NewLine + i2Data.Substring(19); }
+                                        name_CPXXBox.Text = output_name + "\n" + output_灯带型号 + "\n" + output_电压 + "\n" + output_功率 + "\n" + output_灯数 + "\n" + output_剪切单元 + "\n" + output_长度 + "\n" + output_色温 + "\n" + output_尾巴;
+                                        name_CPXXBox.Text = 重构产品信息_工字标(name_CPXXBox.Text, h2Data);
+                                        labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+                                    }
+
+                                    break;
+                                default:
+                                    MessageBox.Show("未知的模板文件。");
+                                    return;
+                            }
+
+
+                        }
                     }
 
                     catch (Exception ex)
@@ -855,9 +2109,13 @@ namespace BarTender_Dev_Dome
             另存模板();
         }
 
-        private void button_test_Click_1(object sender, EventArgs e)
+        private void label2_Click(object sender, EventArgs e)
         {
-            
+
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
 
         }
 
