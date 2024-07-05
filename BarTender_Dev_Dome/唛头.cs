@@ -22,8 +22,9 @@ namespace maitou
         string output_色温 = "";
         string output_尾巴 = "";
         string output_唛头数量 = "";
+        string jieguo = "";
 
-        public void 正常型号判断(string aa,
+        public string 正常型号判断(string aa,
             bool checkBox_客户Name,
             bool checkBox_客户型号,
             string textBox_客户资料,
@@ -131,7 +132,7 @@ namespace maitou
             else
             {
                 // 如果没有找到匹配项，则输出错误信息
-                MessageBox.Show("未找到灯带型号匹配项。", "错误");
+                //MessageBox.Show("未找到灯带型号匹配项。", "错误");
             }
 
             //电压
@@ -164,12 +165,15 @@ namespace maitou
             // 色温
             if (parts.Length >= 6)
             {
+                string numericValue;
                 // 第五个"-"和第六个"-"之间的内容是parts[5]，因为数组索引是从0开始的
                 string contentBetweenFifthAndSixth = parts[5];
 
+
+
                 // 检查灯带系列是否为"S"或"D"
-                string series = 灯带系列; 
-                if (series.Equals("S") || series.Equals("D"))
+                string series = 灯带系列;
+                if (series.Equals("S") || series.Equals("E"))
                 {
 
                     // 如果灯带系列是"S"或"D"，执行新的逻辑
@@ -188,19 +192,39 @@ namespace maitou
                     else
                     {
                         // 如果包含数字，则提取数字部分
-                        string numericValue = Regex.Replace(contentBetweenFifthAndSixth, @"[^0-9]", "");
+                        numericValue = Regex.Replace(contentBetweenFifthAndSixth, @"[^0-9]", "");
                         output_色温 = $"{numericValue}K";
                     }
                 }
 
-                 
+                // 检查 "全彩" 是否存在于 cpxxBox.Text 中
+                bool containsFullColor = aa.Contains("全彩");
 
+
+                if (contentBetweenFifthAndSixth == "R" && containsFullColor) { output_色温 = $"Red(Full color jacket)"; }
+                else if (contentBetweenFifthAndSixth == "R" && !containsFullColor) { output_色温 = $"Red"; }
+                else if (contentBetweenFifthAndSixth == "B" && containsFullColor) { output_色温 = $"Blue(Full color jacket)"; }
+                else if (contentBetweenFifthAndSixth == "B" && !containsFullColor) { output_色温 = $"Blue"; }
+                else if (contentBetweenFifthAndSixth == "G" && containsFullColor) { output_色温 = $"Green(Full color jacket)"; }
+                else if (contentBetweenFifthAndSixth == "G" && !containsFullColor) { output_色温 = $"Green"; }
+                else if (contentBetweenFifthAndSixth == "O" && containsFullColor) { output_色温 = $"Orange(Full color jacket)"; }
+                else if (contentBetweenFifthAndSixth == "O" && !containsFullColor) { output_色温 = $"Orange"; }
+                else if (contentBetweenFifthAndSixth == "Y" && containsFullColor) { output_色温 = $"Yellow(Full color jacket)"; }
+                else if (contentBetweenFifthAndSixth == "Y" && !containsFullColor) { output_色温 = $"Yellow"; }
+                else if (contentBetweenFifthAndSixth == "Y578") { output_色温 = $"Yellow (Full color jacket) (Y578nm)"; }
+                else if (contentBetweenFifthAndSixth == "Y580") { output_色温 = $"Yellow (Full color jacket) (Y580nm)"; }
+                else if (contentBetweenFifthAndSixth == "Y582") { output_色温 = $"Yellow (Full color jacket) (Y582nm)"; }
+                else if (aa.Contains("黑色遮光+雾面发光")) { output_色温 = $"{Regex.Replace(contentBetweenFifthAndSixth, @"[^0-9]", "")}K(Black jacket)"; }
+                else if (aa.Contains("黑色全彩")) { output_色温 = $"{Regex.Replace(contentBetweenFifthAndSixth, @"[^0-9]", "")}K(Full Black jacket)"; }
+                else if (aa.Contains("白+暖白")) { output_色温 = $"Warm White+White"; }
+                else if (aa.Contains("暖白+暖白")) { output_色温 = $"Warm White+Warm White"; }
 
             }
             else
             {
                 MessageBox.Show("未找到色温匹配项。", "错误");
             }
+
 
             // 计算逗号的数量
             int commaCount = textBox_唛头数量.Count(c => c == ',');
@@ -227,26 +251,16 @@ namespace maitou
                 output_唛头数量 = textBox_唛头数量;
             }
             
+            jieguo=output_name +"\n" + output_灯带型号 + "\n" + output_电压 + "\n" +  output_唛头数量 + "\n" +  textBox_唛头尺寸  + "\n" + output_色温 ;
+            return jieguo;
 
-
-
-            MessageBox.Show(output_name +"\n" + output_灯带型号 + "\n" + output_电压 + "\n" +  output_唛头数量 + "\n" +  textBox_唛头尺寸  + "\n" + output_色温 , "提取结果");
-            // name_CPXXBox.Text = output_name + "\n" + output_灯带型号 + "\n" + output_电压 + "\n" + output_功率 + "\n" + output_灯数 + "\n" + output_剪切单元 + "\n" + output_长度 + "\n" + output_色温 ;
-
-        }
-
-        public void 中国制造(bool checkBox_取消中国制造)
-        {
-            //判断尾巴Made in China
-            if (checkBox_取消中国制造)
-            {
-                output_尾巴 = " ";
-            }
-            else
-            {
-                output_尾巴 = "Made in China";
-            }
+            //MessageBox.Show(output_name +"\n" + output_灯带型号 + "\n" + output_电压 + "\n" +  output_唛头数量 + "\n" +  textBox_唛头尺寸  + "\n" + output_色温 , "提取结果");
+            //name_CPXXBox.Text = output_name + "\n" + output_灯带型号 + "\n" + output_电压 + "\n" + output_功率 + "\n" + output_灯数 + "\n" + output_剪切单元 + "\n" + output_长度 + "\n" + output_色温 ;
 
         }
+
+
+
+
     }
 }
