@@ -1,6 +1,5 @@
 # A BarTender develope demo in C#
 
-![image](https://raw.githubusercontent.com/ospanic/Bartender_Dev_Dome/master/run.png)
 
 这是一个用c#语言编写的BarTender二次开发示例程序，展示了BarTender软件的部分功能。
 
