@@ -119,6 +119,10 @@
             this.printer_comboBox = new System.Windows.Forms.ComboBox();
             this.button_另存为 = new System.Windows.Forms.Button();
             this.preview_btn = new System.Windows.Forms.Button();
+            this.button_加载PDF = new System.Windows.Forms.Button();
+            this.label20 = new System.Windows.Forms.Label();
+            this.textBox_pdf = new System.Windows.Forms.TextBox();
+            this.button_打印PDF = new System.Windows.Forms.Button();
             this.config_gBox.SuspendLayout();
             this.groupBox_唛头显指.SuspendLayout();
             this.groupBox5.SuspendLayout();
@@ -135,6 +139,10 @@
             // 
             // config_gBox
             // 
+            this.config_gBox.Controls.Add(this.button_打印PDF);
+            this.config_gBox.Controls.Add(this.textBox_pdf);
+            this.config_gBox.Controls.Add(this.button_加载PDF);
+            this.config_gBox.Controls.Add(this.label20);
             this.config_gBox.Controls.Add(this.groupBox_唛头显指);
             this.config_gBox.Controls.Add(this.button_test);
             this.config_gBox.Controls.Add(this.提示框);
@@ -295,10 +303,10 @@
             this.提示框.BackColor = System.Drawing.Color.Black;
             this.提示框.Font = new System.Drawing.Font("宋体", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.提示框.ForeColor = System.Drawing.Color.White;
-            this.提示框.Location = new System.Drawing.Point(7, 467);
+            this.提示框.Location = new System.Drawing.Point(7, 491);
             this.提示框.Multiline = true;
             this.提示框.Name = "提示框";
-            this.提示框.Size = new System.Drawing.Size(257, 118);
+            this.提示框.Size = new System.Drawing.Size(257, 94);
             this.提示框.TabIndex = 170;
             // 
             // groupBox5
@@ -529,7 +537,7 @@
             this.groupBox_数据库.Controls.Add(this.Box_数据库);
             this.groupBox_数据库.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.groupBox_数据库.ForeColor = System.Drawing.Color.Red;
-            this.groupBox_数据库.Location = new System.Drawing.Point(6, 414);
+            this.groupBox_数据库.Location = new System.Drawing.Point(6, 408);
             this.groupBox_数据库.Name = "groupBox_数据库";
             this.groupBox_数据库.Size = new System.Drawing.Size(344, 45);
             this.groupBox_数据库.TabIndex = 168;
@@ -1034,7 +1042,7 @@
             this.groupBox2.ForeColor = System.Drawing.Color.Red;
             this.groupBox2.Location = new System.Drawing.Point(6, 163);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(344, 249);
+            this.groupBox2.Size = new System.Drawing.Size(344, 245);
             this.groupBox2.TabIndex = 151;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "产品信息";
@@ -1079,7 +1087,7 @@
             this.cpxxBox.Location = new System.Drawing.Point(8, 69);
             this.cpxxBox.Multiline = true;
             this.cpxxBox.Name = "cpxxBox";
-            this.cpxxBox.Size = new System.Drawing.Size(327, 174);
+            this.cpxxBox.Size = new System.Drawing.Size(327, 167);
             this.cpxxBox.TabIndex = 135;
             this.cpxxBox.Text = "C-SFR-F22B-D24V-126-W6666-2835-F【正弯】(三面发光）(恒流)(额定功率12W)(7灯/5.56cm)(三色共挤工艺)(仅用光源中心" +
     "BIN)【带定位槽】\r\nB-硅胶注塑式前接-F22B/DTW/D2-白线-IP68-红黑Φ6.5硅胶线-1M（端部出线）(压阻水铜环)（非水下方案）\r\nB-硅胶" +
@@ -1186,6 +1194,47 @@
             this.preview_btn.Text = "预览";
             this.preview_btn.UseVisualStyleBackColor = true;
             this.preview_btn.Click += new System.EventHandler(this.preview_btn_Click);
+            // 
+            // button_加载PDF
+            // 
+            this.button_加载PDF.Font = new System.Drawing.Font("黑体", 6.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_加载PDF.Location = new System.Drawing.Point(164, 459);
+            this.button_加载PDF.Name = "button_加载PDF";
+            this.button_加载PDF.Size = new System.Drawing.Size(39, 21);
+            this.button_加载PDF.TabIndex = 174;
+            this.button_加载PDF.Text = "加载";
+            this.button_加载PDF.UseVisualStyleBackColor = true;
+            this.button_加载PDF.Click += new System.EventHandler(this.button_加载PDF_Click);
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label20.ForeColor = System.Drawing.Color.Red;
+            this.label20.Location = new System.Drawing.Point(6, 463);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(35, 12);
+            this.label20.TabIndex = 173;
+            this.label20.Text = "PDF：";
+            // 
+            // textBox_pdf
+            // 
+            this.textBox_pdf.Font = new System.Drawing.Font("宋体", 9F);
+            this.textBox_pdf.Location = new System.Drawing.Point(38, 459);
+            this.textBox_pdf.Name = "textBox_pdf";
+            this.textBox_pdf.Size = new System.Drawing.Size(120, 21);
+            this.textBox_pdf.TabIndex = 175;
+            // 
+            // button_打印PDF
+            // 
+            this.button_打印PDF.Font = new System.Drawing.Font("黑体", 6.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_打印PDF.Location = new System.Drawing.Point(212, 456);
+            this.button_打印PDF.Name = "button_打印PDF";
+            this.button_打印PDF.Size = new System.Drawing.Size(52, 26);
+            this.button_打印PDF.TabIndex = 176;
+            this.button_打印PDF.Text = "打印PDF";
+            this.button_打印PDF.UseVisualStyleBackColor = true;
+            this.button_打印PDF.Click += new System.EventHandler(this.button_打印PDF_Click);
             // 
             // PrintForm
             // 
@@ -1317,5 +1366,9 @@
         private System.Windows.Forms.CheckBox checkBox_FXK02;
         private System.Windows.Forms.TextBox textBox_XZ01;
         private System.Windows.Forms.CheckBox checkBox_FXK01;
+        private System.Windows.Forms.Button button_打印PDF;
+        private System.Windows.Forms.TextBox textBox_pdf;
+        private System.Windows.Forms.Button button_加载PDF;
+        private System.Windows.Forms.Label label20;
     }
 }
