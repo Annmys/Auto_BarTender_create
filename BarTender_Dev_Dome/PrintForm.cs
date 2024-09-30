@@ -63,7 +63,7 @@ namespace BarTender_Dev_Dome
             LoadConfiguration();
         }
 
-        //读取操作记录
+        //读取操作记录2
         private void LoadConfiguration()
         {
             try
