@@ -32,6 +32,10 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PrintForm));
             this.config_gBox = new System.Windows.Forms.GroupBox();
+            this.button_打印PDF = new System.Windows.Forms.Button();
+            this.textBox_pdf = new System.Windows.Forms.TextBox();
+            this.button_加载PDF = new System.Windows.Forms.Button();
+            this.label20 = new System.Windows.Forms.Label();
             this.groupBox_唛头显指 = new System.Windows.Forms.GroupBox();
             this.textBox_XZ05 = new System.Windows.Forms.TextBox();
             this.checkBox_FXK05 = new System.Windows.Forms.CheckBox();
@@ -119,10 +123,6 @@
             this.printer_comboBox = new System.Windows.Forms.ComboBox();
             this.button_另存为 = new System.Windows.Forms.Button();
             this.preview_btn = new System.Windows.Forms.Button();
-            this.button_加载PDF = new System.Windows.Forms.Button();
-            this.label20 = new System.Windows.Forms.Label();
-            this.textBox_pdf = new System.Windows.Forms.TextBox();
-            this.button_打印PDF = new System.Windows.Forms.Button();
             this.config_gBox.SuspendLayout();
             this.groupBox_唛头显指.SuspendLayout();
             this.groupBox5.SuspendLayout();
@@ -162,6 +162,47 @@
             this.config_gBox.TabIndex = 125;
             this.config_gBox.TabStop = false;
             this.config_gBox.Text = " ";
+            // 
+            // button_打印PDF
+            // 
+            this.button_打印PDF.Font = new System.Drawing.Font("黑体", 6.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_打印PDF.Location = new System.Drawing.Point(212, 456);
+            this.button_打印PDF.Name = "button_打印PDF";
+            this.button_打印PDF.Size = new System.Drawing.Size(52, 26);
+            this.button_打印PDF.TabIndex = 176;
+            this.button_打印PDF.Text = "打印PDF";
+            this.button_打印PDF.UseVisualStyleBackColor = true;
+            this.button_打印PDF.Click += new System.EventHandler(this.button_打印PDF_Click);
+            // 
+            // textBox_pdf
+            // 
+            this.textBox_pdf.Font = new System.Drawing.Font("宋体", 9F);
+            this.textBox_pdf.Location = new System.Drawing.Point(38, 459);
+            this.textBox_pdf.Name = "textBox_pdf";
+            this.textBox_pdf.Size = new System.Drawing.Size(120, 21);
+            this.textBox_pdf.TabIndex = 175;
+            // 
+            // button_加载PDF
+            // 
+            this.button_加载PDF.Font = new System.Drawing.Font("黑体", 6.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_加载PDF.Location = new System.Drawing.Point(164, 459);
+            this.button_加载PDF.Name = "button_加载PDF";
+            this.button_加载PDF.Size = new System.Drawing.Size(39, 21);
+            this.button_加载PDF.TabIndex = 174;
+            this.button_加载PDF.Text = "加载";
+            this.button_加载PDF.UseVisualStyleBackColor = true;
+            this.button_加载PDF.Click += new System.EventHandler(this.button_加载PDF_Click);
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label20.ForeColor = System.Drawing.Color.Red;
+            this.label20.Location = new System.Drawing.Point(6, 463);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(35, 12);
+            this.label20.TabIndex = 173;
+            this.label20.Text = "PDF：";
             // 
             // groupBox_唛头显指
             // 
@@ -339,12 +380,12 @@
             // 
             // textBox_剪切长度
             // 
-            this.textBox_剪切长度.Font = new System.Drawing.Font("宋体", 9F);
+            this.textBox_剪切长度.Font = new System.Drawing.Font("宋体", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox_剪切长度.ForeColor = System.Drawing.Color.Red;
-            this.textBox_剪切长度.Location = new System.Drawing.Point(63, 170);
+            this.textBox_剪切长度.Location = new System.Drawing.Point(63, 168);
             this.textBox_剪切长度.Multiline = true;
             this.textBox_剪切长度.Name = "textBox_剪切长度";
-            this.textBox_剪切长度.Size = new System.Drawing.Size(279, 31);
+            this.textBox_剪切长度.Size = new System.Drawing.Size(279, 44);
             this.textBox_剪切长度.TabIndex = 165;
             // 
             // label8
@@ -352,7 +393,7 @@
             this.label8.AutoSize = true;
             this.label8.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label8.ForeColor = System.Drawing.Color.Red;
-            this.label8.Location = new System.Drawing.Point(5, 178);
+            this.label8.Location = new System.Drawing.Point(5, 182);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(65, 12);
             this.label8.TabIndex = 164;
@@ -372,12 +413,12 @@
             // 
             // textBox_标识码04
             // 
-            this.textBox_标识码04.Font = new System.Drawing.Font("宋体", 9F);
+            this.textBox_标识码04.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox_标识码04.ForeColor = System.Drawing.Color.Black;
-            this.textBox_标识码04.Location = new System.Drawing.Point(46, 129);
+            this.textBox_标识码04.Location = new System.Drawing.Point(46, 126);
             this.textBox_标识码04.Multiline = true;
             this.textBox_标识码04.Name = "textBox_标识码04";
-            this.textBox_标识码04.Size = new System.Drawing.Size(222, 31);
+            this.textBox_标识码04.Size = new System.Drawing.Size(222, 34);
             this.textBox_标识码04.TabIndex = 154;
             this.textBox_标识码04.Text = "MAXI NEON SOCKET END CAP";
             // 
@@ -406,12 +447,12 @@
             // 
             // textBox_标识码03
             // 
-            this.textBox_标识码03.Font = new System.Drawing.Font("宋体", 9F);
+            this.textBox_标识码03.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox_标识码03.ForeColor = System.Drawing.Color.Black;
-            this.textBox_标识码03.Location = new System.Drawing.Point(46, 89);
+            this.textBox_标识码03.Location = new System.Drawing.Point(46, 87);
             this.textBox_标识码03.Multiline = true;
             this.textBox_标识码03.Name = "textBox_标识码03";
-            this.textBox_标识码03.Size = new System.Drawing.Size(222, 31);
+            this.textBox_标识码03.Size = new System.Drawing.Size(222, 33);
             this.textBox_标识码03.TabIndex = 151;
             this.textBox_标识码03.Text = "MAXI NEON SOCKET END CAP";
             // 
@@ -433,7 +474,7 @@
             this.checkBox_结尾.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox_结尾.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.checkBox_结尾.ForeColor = System.Drawing.Color.Black;
-            this.checkBox_结尾.Location = new System.Drawing.Point(278, 229);
+            this.checkBox_结尾.Location = new System.Drawing.Point(274, 236);
             this.checkBox_结尾.Name = "checkBox_结尾";
             this.checkBox_结尾.Size = new System.Drawing.Size(48, 16);
             this.checkBox_结尾.TabIndex = 149;
@@ -444,10 +485,10 @@
             // 
             this.textBox_结尾.Font = new System.Drawing.Font("宋体", 9F);
             this.textBox_结尾.ForeColor = System.Drawing.Color.Black;
-            this.textBox_结尾.Location = new System.Drawing.Point(46, 213);
+            this.textBox_结尾.Location = new System.Drawing.Point(46, 229);
             this.textBox_结尾.Multiline = true;
             this.textBox_结尾.Name = "textBox_结尾";
-            this.textBox_结尾.Size = new System.Drawing.Size(222, 49);
+            this.textBox_结尾.Size = new System.Drawing.Size(222, 32);
             this.textBox_结尾.TabIndex = 148;
             this.textBox_结尾.Text = "Made in China";
             // 
@@ -456,7 +497,7 @@
             this.label9.AutoSize = true;
             this.label9.Font = new System.Drawing.Font("宋体", 9F);
             this.label9.ForeColor = System.Drawing.Color.Black;
-            this.label9.Location = new System.Drawing.Point(6, 233);
+            this.label9.Location = new System.Drawing.Point(6, 238);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(35, 12);
             this.label9.TabIndex = 147;
@@ -488,7 +529,7 @@
             // 
             // textBox_标识码02
             // 
-            this.textBox_标识码02.Font = new System.Drawing.Font("宋体", 9F);
+            this.textBox_标识码02.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox_标识码02.ForeColor = System.Drawing.Color.Black;
             this.textBox_标识码02.Location = new System.Drawing.Point(46, 50);
             this.textBox_标识码02.Multiline = true;
@@ -510,12 +551,12 @@
             // 
             // textBox_标识码01
             // 
-            this.textBox_标识码01.Font = new System.Drawing.Font("宋体", 9F);
+            this.textBox_标识码01.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox_标识码01.ForeColor = System.Drawing.Color.Black;
-            this.textBox_标识码01.Location = new System.Drawing.Point(46, 13);
+            this.textBox_标识码01.Location = new System.Drawing.Point(46, 11);
             this.textBox_标识码01.Multiline = true;
             this.textBox_标识码01.Name = "textBox_标识码01";
-            this.textBox_标识码01.Size = new System.Drawing.Size(222, 31);
+            this.textBox_标识码01.Size = new System.Drawing.Size(222, 33);
             this.textBox_标识码01.TabIndex = 142;
             this.textBox_标识码01.Text = "MAXI NEON SOCKET END CAP";
             // 
@@ -1194,47 +1235,6 @@
             this.preview_btn.Text = "预览";
             this.preview_btn.UseVisualStyleBackColor = true;
             this.preview_btn.Click += new System.EventHandler(this.preview_btn_Click);
-            // 
-            // button_加载PDF
-            // 
-            this.button_加载PDF.Font = new System.Drawing.Font("黑体", 6.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_加载PDF.Location = new System.Drawing.Point(164, 459);
-            this.button_加载PDF.Name = "button_加载PDF";
-            this.button_加载PDF.Size = new System.Drawing.Size(39, 21);
-            this.button_加载PDF.TabIndex = 174;
-            this.button_加载PDF.Text = "加载";
-            this.button_加载PDF.UseVisualStyleBackColor = true;
-            this.button_加载PDF.Click += new System.EventHandler(this.button_加载PDF_Click);
-            // 
-            // label20
-            // 
-            this.label20.AutoSize = true;
-            this.label20.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label20.ForeColor = System.Drawing.Color.Red;
-            this.label20.Location = new System.Drawing.Point(6, 463);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(35, 12);
-            this.label20.TabIndex = 173;
-            this.label20.Text = "PDF：";
-            // 
-            // textBox_pdf
-            // 
-            this.textBox_pdf.Font = new System.Drawing.Font("宋体", 9F);
-            this.textBox_pdf.Location = new System.Drawing.Point(38, 459);
-            this.textBox_pdf.Name = "textBox_pdf";
-            this.textBox_pdf.Size = new System.Drawing.Size(120, 21);
-            this.textBox_pdf.TabIndex = 175;
-            // 
-            // button_打印PDF
-            // 
-            this.button_打印PDF.Font = new System.Drawing.Font("黑体", 6.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_打印PDF.Location = new System.Drawing.Point(212, 456);
-            this.button_打印PDF.Name = "button_打印PDF";
-            this.button_打印PDF.Size = new System.Drawing.Size(52, 26);
-            this.button_打印PDF.TabIndex = 176;
-            this.button_打印PDF.Text = "打印PDF";
-            this.button_打印PDF.UseVisualStyleBackColor = true;
-            this.button_打印PDF.Click += new System.EventHandler(this.button_打印PDF_Click);
             // 
             // PrintForm
             // 
