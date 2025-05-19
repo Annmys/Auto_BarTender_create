@@ -30,23 +30,15 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PrintForm));
             this.config_gBox = new System.Windows.Forms.GroupBox();
+            this.button_AI = new System.Windows.Forms.Button();
+            this.button_包装计算 = new System.Windows.Forms.Button();
             this.button_打印PDF = new System.Windows.Forms.Button();
             this.textBox_pdf = new System.Windows.Forms.TextBox();
             this.button_加载PDF = new System.Windows.Forms.Button();
             this.label20 = new System.Windows.Forms.Label();
-            this.groupBox_唛头显指 = new System.Windows.Forms.GroupBox();
-            this.textBox_XZ05 = new System.Windows.Forms.TextBox();
-            this.checkBox_FXK05 = new System.Windows.Forms.CheckBox();
-            this.textBox_XZ04 = new System.Windows.Forms.TextBox();
-            this.checkBox_FXK04 = new System.Windows.Forms.CheckBox();
-            this.textBox_XZ03 = new System.Windows.Forms.TextBox();
-            this.checkBox_FXK03 = new System.Windows.Forms.CheckBox();
-            this.textBox_XZ02 = new System.Windows.Forms.TextBox();
-            this.checkBox_FXK02 = new System.Windows.Forms.CheckBox();
-            this.textBox_XZ01 = new System.Windows.Forms.TextBox();
-            this.checkBox_FXK01 = new System.Windows.Forms.CheckBox();
             this.button_test = new System.Windows.Forms.Button();
             this.提示框 = new System.Windows.Forms.TextBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
@@ -79,6 +71,17 @@
             this.label19 = new System.Windows.Forms.Label();
             this.label18 = new System.Windows.Forms.Label();
             this.textBox_唛头名称 = new System.Windows.Forms.TextBox();
+            this.groupBox_唛头显指 = new System.Windows.Forms.GroupBox();
+            this.textBox_XZ05 = new System.Windows.Forms.TextBox();
+            this.checkBox_FXK05 = new System.Windows.Forms.CheckBox();
+            this.textBox_XZ04 = new System.Windows.Forms.TextBox();
+            this.checkBox_FXK04 = new System.Windows.Forms.CheckBox();
+            this.textBox_XZ03 = new System.Windows.Forms.TextBox();
+            this.checkBox_FXK03 = new System.Windows.Forms.CheckBox();
+            this.textBox_XZ02 = new System.Windows.Forms.TextBox();
+            this.checkBox_FXK02 = new System.Windows.Forms.CheckBox();
+            this.textBox_XZ01 = new System.Windows.Forms.TextBox();
+            this.checkBox_FXK01 = new System.Windows.Forms.CheckBox();
             this.checkBox_唛头电压自动 = new System.Windows.Forms.CheckBox();
             this.checkBox_唛头型号自动 = new System.Windows.Forms.CheckBox();
             this.textBox_唛头电压 = new System.Windows.Forms.TextBox();
@@ -100,9 +103,21 @@
             this.Box_Name = new System.Windows.Forms.TextBox();
             this.openFilebtn = new System.Windows.Forms.Button();
             this.fileNametBox = new System.Windows.Forms.TextBox();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.label23 = new System.Windows.Forms.Label();
+            this.textBox_线长 = new System.Windows.Forms.TextBox();
+            this.label22 = new System.Windows.Forms.Label();
+            this.textBox_条形码 = new System.Windows.Forms.TextBox();
+            this.label21 = new System.Windows.Forms.Label();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.textBox_po号2 = new System.Windows.Forms.TextBox();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.button_订单导入 = new System.Windows.Forms.Button();
+            this.textBox_订单地址 = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.comboBox_唛头规格 = new System.Windows.Forms.ComboBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.checkBox_简化型号 = new System.Windows.Forms.CheckBox();
             this.button_筛选 = new System.Windows.Forms.Button();
             this.checkBox_客制型号 = new System.Windows.Forms.CheckBox();
             this.checkBox_常规型号 = new System.Windows.Forms.CheckBox();
@@ -116,34 +131,45 @@
             this.cpxxBox = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.打印 = new System.Windows.Forms.GroupBox();
+            this.printer_comboBox = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
-            this.label6 = new System.Windows.Forms.Label();
             this.print_btn = new System.Windows.Forms.Button();
-            this.printer_comboBox = new System.Windows.Forms.ComboBox();
+            this.label6 = new System.Windows.Forms.Label();
             this.button_另存为 = new System.Windows.Forms.Button();
             this.preview_btn = new System.Windows.Forms.Button();
+            this.contextMenuStrip_右键菜单 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.清空数据库 = new System.Windows.Forms.ToolStripMenuItem();
+            this.剪切板内容到规格型号 = new System.Windows.Forms.ToolStripMenuItem();
+            this.品名汇总 = new System.Windows.Forms.ToolStripMenuItem();
+            this.打印唛头 = new System.Windows.Forms.ToolStripMenuItem();
+            this.纯附件自动 = new System.Windows.Forms.ToolStripMenuItem();
+            this.工字标汇总 = new System.Windows.Forms.ToolStripMenuItem();
             this.config_gBox.SuspendLayout();
-            this.groupBox_唛头显指.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.groupBox_数据库.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
             this.tabControl_唛头.SuspendLayout();
             this.tabPage3.SuspendLayout();
+            this.groupBox_唛头显指.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
+            this.tabPage4.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.打印.SuspendLayout();
+            this.contextMenuStrip_右键菜单.SuspendLayout();
             this.SuspendLayout();
             // 
             // config_gBox
             // 
+            this.config_gBox.Controls.Add(this.button_AI);
+            this.config_gBox.Controls.Add(this.button_包装计算);
             this.config_gBox.Controls.Add(this.button_打印PDF);
             this.config_gBox.Controls.Add(this.textBox_pdf);
             this.config_gBox.Controls.Add(this.button_加载PDF);
             this.config_gBox.Controls.Add(this.label20);
-            this.config_gBox.Controls.Add(this.groupBox_唛头显指);
             this.config_gBox.Controls.Add(this.button_test);
             this.config_gBox.Controls.Add(this.提示框);
             this.config_gBox.Controls.Add(this.groupBox5);
@@ -156,17 +182,39 @@
             this.config_gBox.Controls.Add(this.button_另存为);
             this.config_gBox.Controls.Add(this.preview_btn);
             this.config_gBox.Dock = System.Windows.Forms.DockStyle.Top;
+            this.config_gBox.ForeColor = System.Drawing.Color.CornflowerBlue;
             this.config_gBox.Location = new System.Drawing.Point(0, 0);
             this.config_gBox.Name = "config_gBox";
-            this.config_gBox.Size = new System.Drawing.Size(1174, 588);
+            this.config_gBox.Size = new System.Drawing.Size(1112, 588);
             this.config_gBox.TabIndex = 125;
             this.config_gBox.TabStop = false;
             this.config_gBox.Text = " ";
             // 
+            // button_AI
+            // 
+            this.button_AI.Location = new System.Drawing.Point(91, 557);
+            this.button_AI.Name = "button_AI";
+            this.button_AI.Size = new System.Drawing.Size(53, 21);
+            this.button_AI.TabIndex = 178;
+            this.button_AI.Text = "AI";
+            this.button_AI.UseVisualStyleBackColor = true;
+            this.button_AI.Click += new System.EventHandler(this.button_AI_Click);
+            // 
+            // button_包装计算
+            // 
+            this.button_包装计算.Font = new System.Drawing.Font("微软雅黑", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_包装计算.Location = new System.Drawing.Point(983, 536);
+            this.button_包装计算.Name = "button_包装计算";
+            this.button_包装计算.Size = new System.Drawing.Size(123, 39);
+            this.button_包装计算.TabIndex = 177;
+            this.button_包装计算.Text = "包装计算";
+            this.button_包装计算.UseVisualStyleBackColor = true;
+            this.button_包装计算.Click += new System.EventHandler(this.button_包装计算_Click_1);
+            // 
             // button_打印PDF
             // 
             this.button_打印PDF.Font = new System.Drawing.Font("黑体", 6.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_打印PDF.Location = new System.Drawing.Point(212, 456);
+            this.button_打印PDF.Location = new System.Drawing.Point(226, 459);
             this.button_打印PDF.Name = "button_打印PDF";
             this.button_打印PDF.Size = new System.Drawing.Size(52, 26);
             this.button_打印PDF.TabIndex = 176;
@@ -177,7 +225,7 @@
             // textBox_pdf
             // 
             this.textBox_pdf.Font = new System.Drawing.Font("宋体", 9F);
-            this.textBox_pdf.Location = new System.Drawing.Point(38, 459);
+            this.textBox_pdf.Location = new System.Drawing.Point(45, 459);
             this.textBox_pdf.Name = "textBox_pdf";
             this.textBox_pdf.Size = new System.Drawing.Size(120, 21);
             this.textBox_pdf.TabIndex = 175;
@@ -185,11 +233,11 @@
             // button_加载PDF
             // 
             this.button_加载PDF.Font = new System.Drawing.Font("黑体", 6.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_加载PDF.Location = new System.Drawing.Point(164, 459);
+            this.button_加载PDF.Location = new System.Drawing.Point(178, 462);
             this.button_加载PDF.Name = "button_加载PDF";
             this.button_加载PDF.Size = new System.Drawing.Size(39, 21);
             this.button_加载PDF.TabIndex = 174;
-            this.button_加载PDF.Text = "加载";
+            this.button_加载PDF.Text = "加载PDF";
             this.button_加载PDF.UseVisualStyleBackColor = true;
             this.button_加载PDF.Click += new System.EventHandler(this.button_加载PDF_Click);
             // 
@@ -198,140 +246,15 @@
             this.label20.AutoSize = true;
             this.label20.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label20.ForeColor = System.Drawing.Color.Red;
-            this.label20.Location = new System.Drawing.Point(6, 463);
+            this.label20.Location = new System.Drawing.Point(13, 463);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(35, 12);
             this.label20.TabIndex = 173;
             this.label20.Text = "PDF：";
             // 
-            // groupBox_唛头显指
-            // 
-            this.groupBox_唛头显指.Controls.Add(this.textBox_XZ05);
-            this.groupBox_唛头显指.Controls.Add(this.checkBox_FXK05);
-            this.groupBox_唛头显指.Controls.Add(this.textBox_XZ04);
-            this.groupBox_唛头显指.Controls.Add(this.checkBox_FXK04);
-            this.groupBox_唛头显指.Controls.Add(this.textBox_XZ03);
-            this.groupBox_唛头显指.Controls.Add(this.checkBox_FXK03);
-            this.groupBox_唛头显指.Controls.Add(this.textBox_XZ02);
-            this.groupBox_唛头显指.Controls.Add(this.checkBox_FXK02);
-            this.groupBox_唛头显指.Controls.Add(this.textBox_XZ01);
-            this.groupBox_唛头显指.Controls.Add(this.checkBox_FXK01);
-            this.groupBox_唛头显指.Location = new System.Drawing.Point(275, 465);
-            this.groupBox_唛头显指.Name = "groupBox_唛头显指";
-            this.groupBox_唛头显指.Size = new System.Drawing.Size(80, 117);
-            this.groupBox_唛头显指.TabIndex = 171;
-            this.groupBox_唛头显指.TabStop = false;
-            this.groupBox_唛头显指.Text = "显指";
-            this.groupBox_唛头显指.Visible = false;
-            // 
-            // textBox_XZ05
-            // 
-            this.textBox_XZ05.Font = new System.Drawing.Font("宋体", 9F);
-            this.textBox_XZ05.ForeColor = System.Drawing.Color.Black;
-            this.textBox_XZ05.Location = new System.Drawing.Point(27, 95);
-            this.textBox_XZ05.Multiline = true;
-            this.textBox_XZ05.Name = "textBox_XZ05";
-            this.textBox_XZ05.Size = new System.Drawing.Size(48, 19);
-            this.textBox_XZ05.TabIndex = 186;
-            this.textBox_XZ05.Text = "Ra90";
-            // 
-            // checkBox_FXK05
-            // 
-            this.checkBox_FXK05.AutoSize = true;
-            this.checkBox_FXK05.ForeColor = System.Drawing.Color.Black;
-            this.checkBox_FXK05.Location = new System.Drawing.Point(6, 98);
-            this.checkBox_FXK05.Name = "checkBox_FXK05";
-            this.checkBox_FXK05.Size = new System.Drawing.Size(15, 14);
-            this.checkBox_FXK05.TabIndex = 185;
-            this.checkBox_FXK05.UseVisualStyleBackColor = true;
-            // 
-            // textBox_XZ04
-            // 
-            this.textBox_XZ04.Font = new System.Drawing.Font("宋体", 9F);
-            this.textBox_XZ04.ForeColor = System.Drawing.Color.Black;
-            this.textBox_XZ04.Location = new System.Drawing.Point(27, 76);
-            this.textBox_XZ04.Multiline = true;
-            this.textBox_XZ04.Name = "textBox_XZ04";
-            this.textBox_XZ04.Size = new System.Drawing.Size(48, 19);
-            this.textBox_XZ04.TabIndex = 184;
-            this.textBox_XZ04.Text = "Ra90";
-            // 
-            // checkBox_FXK04
-            // 
-            this.checkBox_FXK04.AutoSize = true;
-            this.checkBox_FXK04.ForeColor = System.Drawing.Color.Black;
-            this.checkBox_FXK04.Location = new System.Drawing.Point(6, 79);
-            this.checkBox_FXK04.Name = "checkBox_FXK04";
-            this.checkBox_FXK04.Size = new System.Drawing.Size(15, 14);
-            this.checkBox_FXK04.TabIndex = 183;
-            this.checkBox_FXK04.UseVisualStyleBackColor = true;
-            // 
-            // textBox_XZ03
-            // 
-            this.textBox_XZ03.Font = new System.Drawing.Font("宋体", 9F);
-            this.textBox_XZ03.ForeColor = System.Drawing.Color.Black;
-            this.textBox_XZ03.Location = new System.Drawing.Point(27, 56);
-            this.textBox_XZ03.Multiline = true;
-            this.textBox_XZ03.Name = "textBox_XZ03";
-            this.textBox_XZ03.Size = new System.Drawing.Size(48, 19);
-            this.textBox_XZ03.TabIndex = 182;
-            this.textBox_XZ03.Text = "Ra90";
-            // 
-            // checkBox_FXK03
-            // 
-            this.checkBox_FXK03.AutoSize = true;
-            this.checkBox_FXK03.ForeColor = System.Drawing.Color.Black;
-            this.checkBox_FXK03.Location = new System.Drawing.Point(6, 59);
-            this.checkBox_FXK03.Name = "checkBox_FXK03";
-            this.checkBox_FXK03.Size = new System.Drawing.Size(15, 14);
-            this.checkBox_FXK03.TabIndex = 181;
-            this.checkBox_FXK03.UseVisualStyleBackColor = true;
-            // 
-            // textBox_XZ02
-            // 
-            this.textBox_XZ02.Font = new System.Drawing.Font("宋体", 9F);
-            this.textBox_XZ02.ForeColor = System.Drawing.Color.Black;
-            this.textBox_XZ02.Location = new System.Drawing.Point(27, 37);
-            this.textBox_XZ02.Multiline = true;
-            this.textBox_XZ02.Name = "textBox_XZ02";
-            this.textBox_XZ02.Size = new System.Drawing.Size(48, 19);
-            this.textBox_XZ02.TabIndex = 180;
-            this.textBox_XZ02.Text = "HB";
-            // 
-            // checkBox_FXK02
-            // 
-            this.checkBox_FXK02.AutoSize = true;
-            this.checkBox_FXK02.ForeColor = System.Drawing.Color.Black;
-            this.checkBox_FXK02.Location = new System.Drawing.Point(6, 40);
-            this.checkBox_FXK02.Name = "checkBox_FXK02";
-            this.checkBox_FXK02.Size = new System.Drawing.Size(15, 14);
-            this.checkBox_FXK02.TabIndex = 179;
-            this.checkBox_FXK02.UseVisualStyleBackColor = true;
-            // 
-            // textBox_XZ01
-            // 
-            this.textBox_XZ01.Font = new System.Drawing.Font("宋体", 9F);
-            this.textBox_XZ01.ForeColor = System.Drawing.Color.Black;
-            this.textBox_XZ01.Location = new System.Drawing.Point(27, 17);
-            this.textBox_XZ01.Multiline = true;
-            this.textBox_XZ01.Name = "textBox_XZ01";
-            this.textBox_XZ01.Size = new System.Drawing.Size(48, 19);
-            this.textBox_XZ01.TabIndex = 178;
-            this.textBox_XZ01.Text = "VB";
-            // 
-            // checkBox_FXK01
-            // 
-            this.checkBox_FXK01.AutoSize = true;
-            this.checkBox_FXK01.ForeColor = System.Drawing.Color.Black;
-            this.checkBox_FXK01.Location = new System.Drawing.Point(6, 20);
-            this.checkBox_FXK01.Name = "checkBox_FXK01";
-            this.checkBox_FXK01.Size = new System.Drawing.Size(15, 14);
-            this.checkBox_FXK01.TabIndex = 172;
-            this.checkBox_FXK01.UseVisualStyleBackColor = true;
-            // 
             // button_test
             // 
-            this.button_test.Location = new System.Drawing.Point(12, 561);
+            this.button_test.Location = new System.Drawing.Point(14, 557);
             this.button_test.Name = "button_test";
             this.button_test.Size = new System.Drawing.Size(53, 21);
             this.button_test.TabIndex = 162;
@@ -344,10 +267,10 @@
             this.提示框.BackColor = System.Drawing.Color.Black;
             this.提示框.Font = new System.Drawing.Font("宋体", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.提示框.ForeColor = System.Drawing.Color.White;
-            this.提示框.Location = new System.Drawing.Point(7, 491);
+            this.提示框.Location = new System.Drawing.Point(10, 489);
             this.提示框.Multiline = true;
             this.提示框.Name = "提示框";
-            this.提示框.Size = new System.Drawing.Size(257, 94);
+            this.提示框.Size = new System.Drawing.Size(343, 94);
             this.提示框.TabIndex = 170;
             // 
             // groupBox5
@@ -618,7 +541,7 @@
             // pictureBox
             // 
             this.pictureBox.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.pictureBox.Location = new System.Drawing.Point(733, 12);
+            this.pictureBox.Location = new System.Drawing.Point(1138, -14);
             this.pictureBox.Name = "pictureBox";
             this.pictureBox.Size = new System.Drawing.Size(438, 394);
             this.pictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
@@ -629,12 +552,13 @@
             // 
             this.tabControl_唛头.Controls.Add(this.tabPage3);
             this.tabControl_唛头.Controls.Add(this.tabPage1);
-            this.tabControl_唛头.Location = new System.Drawing.Point(361, 283);
+            this.tabControl_唛头.Controls.Add(this.tabPage2);
+            this.tabControl_唛头.Controls.Add(this.tabPage4);
+            this.tabControl_唛头.Location = new System.Drawing.Point(729, 20);
             this.tabControl_唛头.Name = "tabControl_唛头";
             this.tabControl_唛头.SelectedIndex = 0;
-            this.tabControl_唛头.Size = new System.Drawing.Size(366, 299);
+            this.tabControl_唛头.Size = new System.Drawing.Size(366, 479);
             this.tabControl_唛头.TabIndex = 167;
-            this.tabControl_唛头.Visible = false;
             // 
             // tabPage3
             // 
@@ -643,6 +567,7 @@
             this.tabPage3.Controls.Add(this.label19);
             this.tabPage3.Controls.Add(this.label18);
             this.tabPage3.Controls.Add(this.textBox_唛头名称);
+            this.tabPage3.Controls.Add(this.groupBox_唛头显指);
             this.tabPage3.Controls.Add(this.checkBox_唛头电压自动);
             this.tabPage3.Controls.Add(this.checkBox_唛头型号自动);
             this.tabPage3.Controls.Add(this.textBox_唛头电压);
@@ -658,7 +583,7 @@
             this.tabPage3.Controls.Add(this.label3);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(358, 273);
+            this.tabPage3.Size = new System.Drawing.Size(358, 453);
             this.tabPage3.TabIndex = 4;
             this.tabPage3.Text = "唛头";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -666,6 +591,8 @@
             // checkBox_唛头色温自动
             // 
             this.checkBox_唛头色温自动.AutoSize = true;
+            this.checkBox_唛头色温自动.Checked = true;
+            this.checkBox_唛头色温自动.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox_唛头色温自动.ForeColor = System.Drawing.Color.Black;
             this.checkBox_唛头色温自动.Location = new System.Drawing.Point(312, 251);
             this.checkBox_唛头色温自动.Name = "checkBox_唛头色温自动";
@@ -715,6 +642,131 @@
             this.textBox_唛头名称.Size = new System.Drawing.Size(242, 17);
             this.textBox_唛头名称.TabIndex = 162;
             this.textBox_唛头名称.Text = "LED Flex Linear Light";
+            // 
+            // groupBox_唛头显指
+            // 
+            this.groupBox_唛头显指.Controls.Add(this.textBox_XZ05);
+            this.groupBox_唛头显指.Controls.Add(this.checkBox_FXK05);
+            this.groupBox_唛头显指.Controls.Add(this.textBox_XZ04);
+            this.groupBox_唛头显指.Controls.Add(this.checkBox_FXK04);
+            this.groupBox_唛头显指.Controls.Add(this.textBox_XZ03);
+            this.groupBox_唛头显指.Controls.Add(this.checkBox_FXK03);
+            this.groupBox_唛头显指.Controls.Add(this.textBox_XZ02);
+            this.groupBox_唛头显指.Controls.Add(this.checkBox_FXK02);
+            this.groupBox_唛头显指.Controls.Add(this.textBox_XZ01);
+            this.groupBox_唛头显指.Controls.Add(this.checkBox_FXK01);
+            this.groupBox_唛头显指.Location = new System.Drawing.Point(19, 294);
+            this.groupBox_唛头显指.Name = "groupBox_唛头显指";
+            this.groupBox_唛头显指.Size = new System.Drawing.Size(80, 117);
+            this.groupBox_唛头显指.TabIndex = 171;
+            this.groupBox_唛头显指.TabStop = false;
+            this.groupBox_唛头显指.Text = "显指";
+            this.groupBox_唛头显指.Visible = false;
+            // 
+            // textBox_XZ05
+            // 
+            this.textBox_XZ05.Font = new System.Drawing.Font("宋体", 9F);
+            this.textBox_XZ05.ForeColor = System.Drawing.Color.Black;
+            this.textBox_XZ05.Location = new System.Drawing.Point(27, 95);
+            this.textBox_XZ05.Multiline = true;
+            this.textBox_XZ05.Name = "textBox_XZ05";
+            this.textBox_XZ05.Size = new System.Drawing.Size(48, 19);
+            this.textBox_XZ05.TabIndex = 186;
+            this.textBox_XZ05.Text = "Ra90";
+            // 
+            // checkBox_FXK05
+            // 
+            this.checkBox_FXK05.AutoSize = true;
+            this.checkBox_FXK05.ForeColor = System.Drawing.Color.Black;
+            this.checkBox_FXK05.Location = new System.Drawing.Point(6, 98);
+            this.checkBox_FXK05.Name = "checkBox_FXK05";
+            this.checkBox_FXK05.Size = new System.Drawing.Size(15, 14);
+            this.checkBox_FXK05.TabIndex = 185;
+            this.checkBox_FXK05.UseVisualStyleBackColor = true;
+            // 
+            // textBox_XZ04
+            // 
+            this.textBox_XZ04.Font = new System.Drawing.Font("宋体", 9F);
+            this.textBox_XZ04.ForeColor = System.Drawing.Color.Black;
+            this.textBox_XZ04.Location = new System.Drawing.Point(27, 76);
+            this.textBox_XZ04.Multiline = true;
+            this.textBox_XZ04.Name = "textBox_XZ04";
+            this.textBox_XZ04.Size = new System.Drawing.Size(48, 19);
+            this.textBox_XZ04.TabIndex = 184;
+            this.textBox_XZ04.Text = "Ra90";
+            // 
+            // checkBox_FXK04
+            // 
+            this.checkBox_FXK04.AutoSize = true;
+            this.checkBox_FXK04.ForeColor = System.Drawing.Color.Black;
+            this.checkBox_FXK04.Location = new System.Drawing.Point(6, 79);
+            this.checkBox_FXK04.Name = "checkBox_FXK04";
+            this.checkBox_FXK04.Size = new System.Drawing.Size(15, 14);
+            this.checkBox_FXK04.TabIndex = 183;
+            this.checkBox_FXK04.UseVisualStyleBackColor = true;
+            // 
+            // textBox_XZ03
+            // 
+            this.textBox_XZ03.Font = new System.Drawing.Font("宋体", 9F);
+            this.textBox_XZ03.ForeColor = System.Drawing.Color.Black;
+            this.textBox_XZ03.Location = new System.Drawing.Point(27, 56);
+            this.textBox_XZ03.Multiline = true;
+            this.textBox_XZ03.Name = "textBox_XZ03";
+            this.textBox_XZ03.Size = new System.Drawing.Size(48, 19);
+            this.textBox_XZ03.TabIndex = 182;
+            this.textBox_XZ03.Text = "Ra90";
+            // 
+            // checkBox_FXK03
+            // 
+            this.checkBox_FXK03.AutoSize = true;
+            this.checkBox_FXK03.ForeColor = System.Drawing.Color.Black;
+            this.checkBox_FXK03.Location = new System.Drawing.Point(6, 59);
+            this.checkBox_FXK03.Name = "checkBox_FXK03";
+            this.checkBox_FXK03.Size = new System.Drawing.Size(15, 14);
+            this.checkBox_FXK03.TabIndex = 181;
+            this.checkBox_FXK03.UseVisualStyleBackColor = true;
+            // 
+            // textBox_XZ02
+            // 
+            this.textBox_XZ02.Font = new System.Drawing.Font("宋体", 9F);
+            this.textBox_XZ02.ForeColor = System.Drawing.Color.Black;
+            this.textBox_XZ02.Location = new System.Drawing.Point(27, 37);
+            this.textBox_XZ02.Multiline = true;
+            this.textBox_XZ02.Name = "textBox_XZ02";
+            this.textBox_XZ02.Size = new System.Drawing.Size(48, 19);
+            this.textBox_XZ02.TabIndex = 180;
+            this.textBox_XZ02.Text = "HB";
+            // 
+            // checkBox_FXK02
+            // 
+            this.checkBox_FXK02.AutoSize = true;
+            this.checkBox_FXK02.ForeColor = System.Drawing.Color.Black;
+            this.checkBox_FXK02.Location = new System.Drawing.Point(6, 40);
+            this.checkBox_FXK02.Name = "checkBox_FXK02";
+            this.checkBox_FXK02.Size = new System.Drawing.Size(15, 14);
+            this.checkBox_FXK02.TabIndex = 179;
+            this.checkBox_FXK02.UseVisualStyleBackColor = true;
+            // 
+            // textBox_XZ01
+            // 
+            this.textBox_XZ01.Font = new System.Drawing.Font("宋体", 9F);
+            this.textBox_XZ01.ForeColor = System.Drawing.Color.Black;
+            this.textBox_XZ01.Location = new System.Drawing.Point(27, 17);
+            this.textBox_XZ01.Multiline = true;
+            this.textBox_XZ01.Name = "textBox_XZ01";
+            this.textBox_XZ01.Size = new System.Drawing.Size(48, 19);
+            this.textBox_XZ01.TabIndex = 178;
+            this.textBox_XZ01.Text = "VB";
+            // 
+            // checkBox_FXK01
+            // 
+            this.checkBox_FXK01.AutoSize = true;
+            this.checkBox_FXK01.ForeColor = System.Drawing.Color.Black;
+            this.checkBox_FXK01.Location = new System.Drawing.Point(6, 20);
+            this.checkBox_FXK01.Name = "checkBox_FXK01";
+            this.checkBox_FXK01.Size = new System.Drawing.Size(15, 14);
+            this.checkBox_FXK01.TabIndex = 172;
+            this.checkBox_FXK01.UseVisualStyleBackColor = true;
             // 
             // checkBox_唛头电压自动
             // 
@@ -795,8 +847,6 @@
             // checkBox_po号
             // 
             this.checkBox_po号.AutoSize = true;
-            this.checkBox_po号.Checked = true;
-            this.checkBox_po号.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox_po号.ForeColor = System.Drawing.Color.Black;
             this.checkBox_po号.Location = new System.Drawing.Point(301, 8);
             this.checkBox_po号.Name = "checkBox_po号";
@@ -872,7 +922,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(358, 273);
+            this.tabPage1.Size = new System.Drawing.Size(358, 453);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = " ";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -881,7 +931,7 @@
             // 
             this.textBox_订单编号.Font = new System.Drawing.Font("宋体", 9F);
             this.textBox_订单编号.ForeColor = System.Drawing.Color.Black;
-            this.textBox_订单编号.Location = new System.Drawing.Point(57, 240);
+            this.textBox_订单编号.Location = new System.Drawing.Point(63, 186);
             this.textBox_订单编号.Multiline = true;
             this.textBox_订单编号.Name = "textBox_订单编号";
             this.textBox_订单编号.Size = new System.Drawing.Size(221, 19);
@@ -891,7 +941,7 @@
             // label17
             // 
             this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(0, 244);
+            this.label17.Location = new System.Drawing.Point(6, 190);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(59, 12);
             this.label17.TabIndex = 171;
@@ -947,6 +997,125 @@
             this.fileNametBox.TabIndex = 154;
             this.fileNametBox.Visible = false;
             // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.label23);
+            this.tabPage2.Controls.Add(this.textBox_线长);
+            this.tabPage2.Controls.Add(this.label22);
+            this.tabPage2.Controls.Add(this.textBox_条形码);
+            this.tabPage2.Controls.Add(this.label21);
+            this.tabPage2.Controls.Add(this.checkBox1);
+            this.tabPage2.Controls.Add(this.textBox_po号2);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(358, 453);
+            this.tabPage2.TabIndex = 5;
+            this.tabPage2.Text = "默认项";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // label23
+            // 
+            this.label23.AutoSize = true;
+            this.label23.Location = new System.Drawing.Point(15, 83);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(35, 12);
+            this.label23.TabIndex = 160;
+            this.label23.Text = "线长:";
+            // 
+            // textBox_线长
+            // 
+            this.textBox_线长.Font = new System.Drawing.Font("宋体", 11F);
+            this.textBox_线长.ForeColor = System.Drawing.Color.Black;
+            this.textBox_线长.Location = new System.Drawing.Point(57, 75);
+            this.textBox_线长.Multiline = true;
+            this.textBox_线长.Name = "textBox_线长";
+            this.textBox_线长.Size = new System.Drawing.Size(279, 29);
+            this.textBox_线长.TabIndex = 159;
+            this.textBox_线长.Text = "1m";
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(4, 48);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(47, 12);
+            this.label22.TabIndex = 158;
+            this.label22.Text = "条形码:";
+            // 
+            // textBox_条形码
+            // 
+            this.textBox_条形码.Font = new System.Drawing.Font("宋体", 11F);
+            this.textBox_条形码.ForeColor = System.Drawing.Color.Black;
+            this.textBox_条形码.Location = new System.Drawing.Point(57, 40);
+            this.textBox_条形码.Multiline = true;
+            this.textBox_条形码.Name = "textBox_条形码";
+            this.textBox_条形码.Size = new System.Drawing.Size(279, 29);
+            this.textBox_条形码.TabIndex = 157;
+            this.textBox_条形码.Text = "EAN code: 8422551303324";
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Location = new System.Drawing.Point(22, 14);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(23, 12);
+            this.label21.TabIndex = 156;
+            this.label21.Text = "PO:";
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.ForeColor = System.Drawing.Color.Black;
+            this.checkBox1.Location = new System.Drawing.Point(306, 8);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(48, 16);
+            this.checkBox1.TabIndex = 155;
+            this.checkBox1.Text = "增加";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // textBox_po号2
+            // 
+            this.textBox_po号2.Font = new System.Drawing.Font("宋体", 11F);
+            this.textBox_po号2.ForeColor = System.Drawing.Color.Black;
+            this.textBox_po号2.Location = new System.Drawing.Point(57, 6);
+            this.textBox_po号2.Multiline = true;
+            this.textBox_po号2.Name = "textBox_po号2";
+            this.textBox_po号2.Size = new System.Drawing.Size(242, 27);
+            this.textBox_po号2.TabIndex = 154;
+            this.textBox_po号2.Text = "PO2";
+            // 
+            // tabPage4
+            // 
+            this.tabPage4.Controls.Add(this.button_订单导入);
+            this.tabPage4.Controls.Add(this.textBox_订单地址);
+            this.tabPage4.Location = new System.Drawing.Point(4, 22);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage4.Size = new System.Drawing.Size(358, 453);
+            this.tabPage4.TabIndex = 6;
+            this.tabPage4.Text = "自动";
+            this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // button_订单导入
+            // 
+            this.button_订单导入.Font = new System.Drawing.Font("黑体", 6.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button_订单导入.Location = new System.Drawing.Point(269, 14);
+            this.button_订单导入.Name = "button_订单导入";
+            this.button_订单导入.Size = new System.Drawing.Size(67, 26);
+            this.button_订单导入.TabIndex = 141;
+            this.button_订单导入.Text = "订单导入";
+            this.button_订单导入.UseVisualStyleBackColor = true;
+            this.button_订单导入.Click += new System.EventHandler(this.button_订单导入_Click);
+            // 
+            // textBox_订单地址
+            // 
+            this.textBox_订单地址.Font = new System.Drawing.Font("宋体", 9F);
+            this.textBox_订单地址.Location = new System.Drawing.Point(17, 16);
+            this.textBox_订单地址.Name = "textBox_订单地址";
+            this.textBox_订单地址.Size = new System.Drawing.Size(245, 21);
+            this.textBox_订单地址.TabIndex = 140;
+            // 
             // groupBox3
             // 
             this.groupBox3.BackColor = System.Drawing.SystemColors.Control;
@@ -972,11 +1141,11 @@
             this.comboBox_唛头规格.FormattingEnabled = true;
             this.comboBox_唛头规格.IntegralHeight = false;
             this.comboBox_唛头规格.Items.AddRange(new object[] {
-            "大尺寸（100*150）",
-            "大尺寸（80*150）",
-            "中尺寸（90*60）",
-            "小尺寸（90*45）",
-            "小尺寸（50*100）"});
+            "大尺寸（100150）",
+            "大尺寸（80150）",
+            "中尺寸（9060）",
+            "小尺寸（9045）",
+            "小尺寸（50100）"});
             this.comboBox_唛头规格.Location = new System.Drawing.Point(47, 113);
             this.comboBox_唛头规格.Name = "comboBox_唛头规格";
             this.comboBox_唛头规格.Size = new System.Drawing.Size(245, 23);
@@ -986,6 +1155,7 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.checkBox_简化型号);
             this.groupBox4.Controls.Add(this.button_筛选);
             this.groupBox4.Controls.Add(this.checkBox_客制型号);
             this.groupBox4.Controls.Add(this.checkBox_常规型号);
@@ -998,10 +1168,21 @@
             this.groupBox4.Text = "标签规格选择项";
             this.groupBox4.Visible = false;
             // 
+            // checkBox_简化型号
+            // 
+            this.checkBox_简化型号.AutoSize = true;
+            this.checkBox_简化型号.ForeColor = System.Drawing.Color.Black;
+            this.checkBox_简化型号.Location = new System.Drawing.Point(169, 14);
+            this.checkBox_简化型号.Name = "checkBox_简化型号";
+            this.checkBox_简化型号.Size = new System.Drawing.Size(72, 16);
+            this.checkBox_简化型号.TabIndex = 304;
+            this.checkBox_简化型号.Text = "简化型号";
+            this.checkBox_简化型号.UseVisualStyleBackColor = true;
+            // 
             // button_筛选
             // 
             this.button_筛选.ForeColor = System.Drawing.Color.Black;
-            this.button_筛选.Location = new System.Drawing.Point(171, 9);
+            this.button_筛选.Location = new System.Drawing.Point(251, 11);
             this.button_筛选.Name = "button_筛选";
             this.button_筛选.Size = new System.Drawing.Size(54, 21);
             this.button_筛选.TabIndex = 303;
@@ -1147,26 +1328,37 @@
             // 
             // 打印
             // 
+            this.打印.Controls.Add(this.printer_comboBox);
             this.打印.Controls.Add(this.label7);
             this.打印.Controls.Add(this.textBox1);
-            this.打印.Controls.Add(this.label6);
             this.打印.Controls.Add(this.print_btn);
-            this.打印.Controls.Add(this.printer_comboBox);
+            this.打印.Controls.Add(this.label6);
             this.打印.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.打印.ForeColor = System.Drawing.Color.Red;
-            this.打印.Location = new System.Drawing.Point(759, 467);
+            this.打印.Location = new System.Drawing.Point(359, 459);
             this.打印.Name = "打印";
-            this.打印.Size = new System.Drawing.Size(398, 115);
+            this.打印.Size = new System.Drawing.Size(364, 118);
             this.打印.TabIndex = 148;
             this.打印.TabStop = false;
             this.打印.Text = "打印";
+            // 
+            // printer_comboBox
+            // 
+            this.printer_comboBox.Font = new System.Drawing.Font("宋体", 16F);
+            this.printer_comboBox.FormattingEnabled = true;
+            this.printer_comboBox.Location = new System.Drawing.Point(53, 25);
+            this.printer_comboBox.Name = "printer_comboBox";
+            this.printer_comboBox.Size = new System.Drawing.Size(262, 29);
+            this.printer_comboBox.TabIndex = 144;
+            this.printer_comboBox.Text = "请选择打印机";
+            this.printer_comboBox.SelectedIndexChanged += new System.EventHandler(this.printer_comboBox_SelectedIndexChanged);
             // 
             // label7
             // 
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label7.ForeColor = System.Drawing.Color.Black;
-            this.label7.Location = new System.Drawing.Point(7, 78);
+            this.label7.Location = new System.Drawing.Point(10, 77);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(65, 12);
             this.label7.TabIndex = 143;
@@ -1175,11 +1367,22 @@
             // textBox1
             // 
             this.textBox1.Font = new System.Drawing.Font("宋体", 11F);
-            this.textBox1.Location = new System.Drawing.Point(85, 72);
+            this.textBox1.Location = new System.Drawing.Point(82, 71);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(105, 24);
             this.textBox1.TabIndex = 142;
             this.textBox1.Text = "2";
+            // 
+            // print_btn
+            // 
+            this.print_btn.Font = new System.Drawing.Font("微软雅黑", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.print_btn.Location = new System.Drawing.Point(207, 63);
+            this.print_btn.Name = "print_btn";
+            this.print_btn.Size = new System.Drawing.Size(151, 39);
+            this.print_btn.TabIndex = 131;
+            this.print_btn.Text = "打印";
+            this.print_btn.UseVisualStyleBackColor = true;
+            this.print_btn.Click += new System.EventHandler(this.print_btn_Click);
             // 
             // label6
             // 
@@ -1192,55 +1395,88 @@
             this.label6.TabIndex = 141;
             this.label6.Text = "打印机：";
             // 
-            // print_btn
-            // 
-            this.print_btn.Font = new System.Drawing.Font("微软雅黑", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.print_btn.Location = new System.Drawing.Point(227, 63);
-            this.print_btn.Name = "print_btn";
-            this.print_btn.Size = new System.Drawing.Size(151, 39);
-            this.print_btn.TabIndex = 131;
-            this.print_btn.Text = "打印";
-            this.print_btn.UseVisualStyleBackColor = true;
-            this.print_btn.Click += new System.EventHandler(this.print_btn_Click);
-            // 
-            // printer_comboBox
-            // 
-            this.printer_comboBox.Font = new System.Drawing.Font("宋体", 16F);
-            this.printer_comboBox.FormattingEnabled = true;
-            this.printer_comboBox.Location = new System.Drawing.Point(76, 24);
-            this.printer_comboBox.Name = "printer_comboBox";
-            this.printer_comboBox.Size = new System.Drawing.Size(302, 29);
-            this.printer_comboBox.TabIndex = 127;
-            this.printer_comboBox.Text = "请选择打印机";
-            this.printer_comboBox.SelectedIndexChanged += new System.EventHandler(this.printer_comboBox_SelectedIndexChanged);
-            // 
             // button_另存为
             // 
             this.button_另存为.Font = new System.Drawing.Font("微软雅黑", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button_另存为.Location = new System.Drawing.Point(979, 410);
+            this.button_另存为.Location = new System.Drawing.Point(553, 407);
             this.button_另存为.Name = "button_另存为";
-            this.button_另存为.Size = new System.Drawing.Size(165, 42);
+            this.button_另存为.Size = new System.Drawing.Size(148, 42);
             this.button_另存为.TabIndex = 140;
-            this.button_另存为.Text = "另存为";
+            this.button_另存为.Text = "另存为(F2)";
             this.button_另存为.UseVisualStyleBackColor = true;
             this.button_另存为.Click += new System.EventHandler(this.button_另存为_Click);
             // 
             // preview_btn
             // 
             this.preview_btn.Font = new System.Drawing.Font("微软雅黑", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.preview_btn.Location = new System.Drawing.Point(768, 410);
+            this.preview_btn.Location = new System.Drawing.Point(379, 407);
             this.preview_btn.Name = "preview_btn";
             this.preview_btn.Size = new System.Drawing.Size(148, 42);
             this.preview_btn.TabIndex = 131;
-            this.preview_btn.Text = "预览";
+            this.preview_btn.Text = "预览(F1)";
             this.preview_btn.UseVisualStyleBackColor = true;
             this.preview_btn.Click += new System.EventHandler(this.preview_btn_Click);
+            // 
+            // contextMenuStrip_右键菜单
+            // 
+            this.contextMenuStrip_右键菜单.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.清空数据库,
+            this.剪切板内容到规格型号,
+            this.工字标汇总,
+            this.品名汇总,
+            this.打印唛头,
+            this.纯附件自动});
+            this.contextMenuStrip_右键菜单.Name = "contextMenuStrip_数据库";
+            this.contextMenuStrip_右键菜单.Size = new System.Drawing.Size(197, 136);
+            // 
+            // 清空数据库
+            // 
+            this.清空数据库.Name = "清空数据库";
+            this.清空数据库.Size = new System.Drawing.Size(196, 22);
+            this.清空数据库.Text = "清空数据库";
+            this.清空数据库.Click += new System.EventHandler(this.清空数据库_Click);
+            // 
+            // 剪切板内容到规格型号
+            // 
+            this.剪切板内容到规格型号.Name = "剪切板内容到规格型号";
+            this.剪切板内容到规格型号.Size = new System.Drawing.Size(196, 22);
+            this.剪切板内容到规格型号.Text = "剪切板内容到规格型号";
+            this.剪切板内容到规格型号.Click += new System.EventHandler(this.剪切板内容到规格型号_Click);
+            // 
+            // 品名汇总
+            // 
+            this.品名汇总.Name = "品名汇总";
+            this.品名汇总.Size = new System.Drawing.Size(196, 22);
+            this.品名汇总.Text = "品名汇总";
+            this.品名汇总.Click += new System.EventHandler(this.品名汇总_Click);
+            // 
+            // 打印唛头
+            // 
+            this.打印唛头.Name = "打印唛头";
+            this.打印唛头.Size = new System.Drawing.Size(196, 22);
+            this.打印唛头.Text = "打印唛头";
+            this.打印唛头.Click += new System.EventHandler(this.打印唛头_Click);
+            // 
+            // 纯附件自动
+            // 
+            this.纯附件自动.Name = "纯附件自动";
+            this.纯附件自动.Size = new System.Drawing.Size(196, 22);
+            this.纯附件自动.Text = "纯备注自动";
+            this.纯附件自动.Click += new System.EventHandler(this.纯备注自动_Click);
+            // 
+            // 工字标汇总
+            // 
+            this.工字标汇总.Name = "工字标汇总";
+            this.工字标汇总.Size = new System.Drawing.Size(196, 22);
+            this.工字标汇总.Text = "工字标汇总";
+            this.工字标汇总.Click += new System.EventHandler(this.工字标汇总_Click);
             // 
             // PrintForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1174, 590);
+            this.ClientSize = new System.Drawing.Size(1112, 590);
+            this.ContextMenuStrip = this.contextMenuStrip_右键菜单;
             this.Controls.Add(this.config_gBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -1252,8 +1488,6 @@
             this.Load += new System.EventHandler(this.PrintForm_Load);
             this.config_gBox.ResumeLayout(false);
             this.config_gBox.PerformLayout();
-            this.groupBox_唛头显指.ResumeLayout(false);
-            this.groupBox_唛头显指.PerformLayout();
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
             this.groupBox_数据库.ResumeLayout(false);
@@ -1262,8 +1496,14 @@
             this.tabControl_唛头.ResumeLayout(false);
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
+            this.groupBox_唛头显指.ResumeLayout(false);
+            this.groupBox_唛头显指.PerformLayout();
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
+            this.tabPage2.ResumeLayout(false);
+            this.tabPage2.PerformLayout();
+            this.tabPage4.ResumeLayout(false);
+            this.tabPage4.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.groupBox4.ResumeLayout(false);
@@ -1272,6 +1512,7 @@
             this.groupBox2.PerformLayout();
             this.打印.ResumeLayout(false);
             this.打印.PerformLayout();
+            this.contextMenuStrip_右键菜单.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -1280,7 +1521,6 @@
 
         private System.Windows.Forms.GroupBox config_gBox;
         private System.Windows.Forms.Button print_btn;
-        private System.Windows.Forms.ComboBox printer_comboBox;
         private System.Windows.Forms.PictureBox pictureBox;
         private System.Windows.Forms.Button preview_btn;
         private System.Windows.Forms.TextBox cpxxBox;
@@ -1370,5 +1610,27 @@
         private System.Windows.Forms.TextBox textBox_pdf;
         private System.Windows.Forms.Button button_加载PDF;
         private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.Label label21;
+        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.TextBox textBox_po号2;
+        private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.TextBox textBox_条形码;
+        private System.Windows.Forms.Label label23;
+        private System.Windows.Forms.TextBox textBox_线长;
+        private System.Windows.Forms.CheckBox checkBox_简化型号;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip_右键菜单;
+        private System.Windows.Forms.ToolStripMenuItem 清空数据库;
+        private System.Windows.Forms.ToolStripMenuItem 剪切板内容到规格型号;
+        private System.Windows.Forms.TabPage tabPage4;
+        private System.Windows.Forms.ToolStripMenuItem 纯附件自动;
+        private System.Windows.Forms.Button button_订单导入;
+        private System.Windows.Forms.TextBox textBox_订单地址;
+        private System.Windows.Forms.ToolStripMenuItem 打印唛头;
+        private System.Windows.Forms.ComboBox printer_comboBox;
+        private System.Windows.Forms.Button button_包装计算;
+        private System.Windows.Forms.Button button_AI;
+        private System.Windows.Forms.ToolStripMenuItem 品名汇总;
+        private System.Windows.Forms.ToolStripMenuItem 工字标汇总;
     }
 }
