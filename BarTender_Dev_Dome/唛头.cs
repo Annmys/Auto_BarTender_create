@@ -836,13 +836,8 @@ namespace BarTender_Dev_Dome
                 {
                     folderPath = Path.GetDirectoryName(folderDialog.FileName);
                     lastFolderName = Path.GetFileName(folderPath);
-                    唛头_寻找订单编号(lastFolderName);
-                    EXCEL_包装规格回调(folderPath);
 
-                    string[] excelFiles = Directory.GetFiles(folderPath, "*.xlsx", SearchOption.TopDirectoryOnly);
-                    List<结果数据> 结果列表 = new List<结果数据>();
-
-                    // 读取单位
+                    // 1. 读取单位.txt
                     string 单位文件路径 = Path.Combine(folderPath, "订单资料", "单位.txt");
                     string 单位内容 = "m";
                     if (File.Exists(单位文件路径))
@@ -850,83 +845,35 @@ namespace BarTender_Dev_Dome
                         单位内容 = File.ReadAllText(单位文件路径).Trim();
                     }
 
-                    foreach (string filePath in excelFiles)
+                    // 2. 读取订单资料路径.txt
+                    string 路径文件 = Path.Combine(folderPath, "订单资料", "订单资料路径.txt");
+
+                    string 订单路径 = "";
+                    string 附件路径 = "";
+                    if (File.Exists(路径文件))
                     {
-                        string fileName = Path.GetFileNameWithoutExtension(filePath);
-                        if (fileName.Contains("包装材料需求流转单") || fileName.Contains("流转单"))
-                            continue;
-                        string[] parts = fileName.Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
-                        if (parts.Length >= 2)
+                        var lines = File.ReadAllLines(路径文件);
+                        foreach (var line in lines)
                         {
-                            string 型号 = parts[0].Trim();
-                            string 销售数量 = parts[1].Trim();
-                            string 备注 = parts.Length > 2 ? parts[2].Trim() : "";
-                            结果数据 数据 = new 结果数据
-                            {
-                                产品型号 = 型号,
-                                销售数量 = 销售数量,
-                                备注 = 备注
-                            };
-                            using (ExcelPackage package = new ExcelPackage(new FileInfo(filePath)))
-                            {
-                                foreach (var worksheet in package.Workbook.Worksheets)
-                                {
-                                    if (worksheet.Dimension == null) continue;
-                                    int headerRow = 1;
-                                    for (int row = 1; row <= Math.Min(10, worksheet.Dimension.End.Row); row++)
-                                    {
-                                        if (worksheet.Cells[row, 1].Text.Contains("序号") || worksheet.Cells[row, 1].Text.Equals("序号", StringComparison.OrdinalIgnoreCase))
-                                        {
-                                            headerRow = row;
-                                            break;
-                                        }
-                                    }
-                                    int 序号列 = -1, 条数列 = -1, 米数列 = -1, 标签码1列 = -1, 标签码2列 = -1, 标签码3列 = -1, 标签码4列 = -1, 线长列 = -1, 客户型号列 = -1, 标签显示长度列 = -1;
-                                    for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
-                                    {
-                                        string headerText = worksheet.Cells[headerRow, col].Text.Trim();
-                                        if (headerText.Contains("序号") || headerText.Equals("序号", StringComparison.OrdinalIgnoreCase)) 序号列 = col;
-                                        else if (headerText.Contains("条数") || headerText.Equals("条数", StringComparison.OrdinalIgnoreCase)) 条数列 = col;
-                                        else if (headerText.Contains("米数") || headerText.Equals("米数", StringComparison.OrdinalIgnoreCase)) 米数列 = col;
-                                        else if (headerText.Contains("标签码1") || headerText.Equals("标签码1", StringComparison.OrdinalIgnoreCase)) 标签码1列 = col;
-                                        else if (headerText.Contains("标签码2") || headerText.Equals("标签码2", StringComparison.OrdinalIgnoreCase)) 标签码2列 = col;
-                                        else if (headerText.Contains("标签码3") || headerText.Equals("标签码3", StringComparison.OrdinalIgnoreCase)) 标签码3列 = col;
-                                        else if (headerText.Contains("标签码4") || headerText.Equals("标签码4", StringComparison.OrdinalIgnoreCase)) 标签码4列 = col;
-                                        else if (headerText.Contains("线长") || headerText.Equals("线长", StringComparison.OrdinalIgnoreCase)) 线长列 = col;
-                                        else if (headerText.Contains("客户型号") || headerText.Equals("客户型号", StringComparison.OrdinalIgnoreCase)) 客户型号列 = col;
-                                        else if (headerText.Contains("标签显示长度") || headerText.Equals("标签显示长度", StringComparison.OrdinalIgnoreCase)) 标签显示长度列 = col;
-                                    }
-                                    for (int row = headerRow + 1; row <= worksheet.Dimension.End.Row; row++)
-                                    {
-                                        string 序号 = 序号列 > 0 ? worksheet.Cells[row, 序号列].Text.Trim() : "";
-                                        if (string.IsNullOrEmpty(序号)) continue;
-                                        数据.盒子列表.Add(new List<结果数据.盒子内容> {
-                                    new 结果数据.盒子内容 {
-                                        序号 = worksheet.Cells[row, 序号列].Text,
-                                        条数 = 条数列 > 0 ? worksheet.Cells[row, 条数列].Text : "",
-                                        米数 = 米数列 > 0 ? worksheet.Cells[row, 米数列].Text : "",
-                                        标签码1 = 标签码1列 > 0 ? worksheet.Cells[row, 标签码1列].Text : "",
-                                        标签码2 = 标签码2列 > 0 ? worksheet.Cells[row, 标签码2列].Text : "",
-                                        标签码3 = 标签码3列 > 0 ? worksheet.Cells[row, 标签码3列].Text : "",
-                                        标签码4 = 标签码4列 > 0 ? worksheet.Cells[row, 标签码4列].Text : "",
-                                        线长 = 线长列 > 0 ? worksheet.Cells[row, 线长列].Text : "",
-                                        客户型号 = 客户型号列 > 0 ? worksheet.Cells[row, 客户型号列].Text : "",
-                                        标签显示长度 = 标签显示长度列 > 0 ? worksheet.Cells[row, 标签显示长度列].Text : ""
-                                    }
-                                });
-                                    }
-                                }
-                            }
-                            if (数据.盒子列表.Count > 0)
-                                结果列表.Add(数据);
+                            if (line.StartsWith("订单路径:"))
+                                订单路径 = line.Substring("订单路径:".Length).Trim();
+                            else if (line.StartsWith("附件路径:"))
+                                附件路径 = line.Substring("附件路径:".Length).Trim();
                         }
                     }
+                    // 调试：显示解析出的附件路径
+                    //MessageBox.Show($"Parsed 附件路径: {附件路径}", "Debug: Parsed Path");
 
-                    // 按客户型号或型号分组
-                    var 分组 = 结果列表.GroupBy(x =>
-                        x.盒子列表.SelectMany(b => b).FirstOrDefault()?.客户型号 ?? x.产品型号
-                    );
+                    if (string.IsNullOrEmpty(附件路径) || !File.Exists(附件路径))
+                    {
+                        MessageBox.Show($"未找到有效的附件文件: {附件路径}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
 
+                    // 3. 使用附件路径指定的单个Excel文件
+                    string[] excelFiles = new string[] { 附件路径 };
+
+                    // 4. 选择保存位置
                     using (var saveFileDialog = new SaveFileDialog())
                     {
                         saveFileDialog.Filter = "Excel文件|*.xlsx";
@@ -938,95 +885,359 @@ namespace BarTender_Dev_Dome
                             string savePath = saveFileDialog.FileName;
                             using (ExcelPackage package = new ExcelPackage())
                             {
-                                var worksheet = package.Workbook.Worksheets.Add("工字标汇总");
-                                // 表头
-                                worksheet.Cells[1, 1].Value = "序号";
-                                worksheet.Cells[1, 2].Value = "标签码1";
-                                worksheet.Cells[1, 3].Value = "标签码2";
-                                worksheet.Cells[1, 4].Value = "标签码3";
-                                worksheet.Cells[1, 5].Value = "标签码4";
-                                worksheet.Cells[1, 6].Value = "标签码5";
-                                worksheet.Cells[1, 7].Value = "条数";
-                                worksheet.Cells[1, 8].Value = "长度";
-                                worksheet.Cells[1, 9].Value = "客户型号";
-                                worksheet.Cells[1, 10].Value = "PO号";
-                                worksheet.Cells[1, 11].Value = "条形码";
-                                worksheet.Cells[1, 12].Value = "线长";
-                                using (var range = worksheet.Cells[1, 1, 1, 12])
+                                foreach (string filePath in excelFiles) // 此循环只处理指定的一个文件路径
                                 {
-                                    range.Style.Font.Bold = true;
-                                    range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                                    range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
-                                }
-                                int rowIndex = 2;
-                                int seqNo = 1;
-
-                                // 合并所有分组数据到一个文件
-                                foreach (var group in 分组)
-                                {
-                                    foreach (var 数据 in group)
+                                    // 调试：显示正在处理的文件路径 (已注释，如果需要可取消注释)
+                                    //MessageBox.Show($"Processing file: {filePath}", "Debug: Processing File");
+                                    using (ExcelPackage srcPackage = new ExcelPackage(new FileInfo(filePath)))
                                     {
-                                        foreach (var 盒子 in 数据.盒子列表)
+                                        foreach (var worksheet in srcPackage.Workbook.Worksheets)
                                         {
-                                            foreach (var 内容 in 盒子)
+                                            if (worksheet.Dimension == null) continue;
+
+                                            StringBuilder sheetDebugInfo = new StringBuilder();
+                                            sheetDebugInfo.AppendLine($"正在处理工作表: {worksheet.Name ?? "未知工作表名称"}");
+
+                                            // 新建结果sheet，名称同源sheet - 移到表头查找之前，确保即使没找到表头也创建结果sheet
+                                            string resultSheetName = Path.GetFileNameWithoutExtension(filePath) + "-" + worksheet.Name;
+                                            // EPPlus sheet名不能超过31字符，做个截断
+                                            if (resultSheetName.Length > 31) resultSheetName = resultSheetName.Substring(0, 31);
+                                            var resultSheet = package.Workbook.Worksheets.Add(resultSheetName);
+
+                                            // 表头 - 始终写入表头到结果sheet
+                                            resultSheet.Cells[1, 1].Value = "序号";
+                                            resultSheet.Cells[1, 2].Value = "标签码1";
+                                            resultSheet.Cells[1, 3].Value = "标签码2";
+                                            resultSheet.Cells[1, 4].Value = "标签码3";
+                                            resultSheet.Cells[1, 5].Value = "标签码4";
+                                            resultSheet.Cells[1, 6].Value = "标签码5";
+                                            resultSheet.Cells[1, 7].Value = "条数";
+                                            resultSheet.Cells[1, 8].Value = "长度";
+                                            resultSheet.Cells[1, 9].Value = "客户型号";
+                                            resultSheet.Cells[1, 10].Value = "PO号";
+                                            resultSheet.Cells[1, 11].Value = "条形码";
+                                            resultSheet.Cells[1, 12].Value = "线长";
+                                            using (var range = resultSheet.Cells[1, 1, 1, 12])
                                             {
-                                                // 长度字段单位判断
-                                                string 长度字段 = "";
-                                                switch (单位内容)
+                                                range.Style.Font.Bold = true;
+                                                range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                                                range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+                                            }
+
+                                            // 查找表头行（在前30行，A列中查找“序号”或“序”）
+                                            int headerRow = -1;
+                                            int 序号列号 = -1; // 还需要找到“序号”所在的列号
+                                            // 修改：始终至少搜索30行
+                                            int maxRowsToSearch = Math.Max(30, worksheet.Dimension.End.Row);
+
+                                            sheetDebugInfo.AppendLine($"EPPlus报告的实际最后一行: {worksheet.Dimension.End.Row}");
+                                            sheetDebugInfo.AppendLine($"计算出的表头搜索行数（至少30）: {maxRowsToSearch}");
+
+                                            // 只在A列（列1）查找
+                                            int searchColumn = 1;
+                                            for (int row = 1; row <= maxRowsToSearch; row++)
+                                            {
+                                                // 获取单元格值并尝试转换为字符串
+                                                object cellValueObject = worksheet.Cells[row, searchColumn].Value;
+                                                string cellValueString = cellValueObject?.ToString()?.Trim() ?? "";
+                                                string cellValueClean = new string(cellValueString.Where(c => !char.IsWhiteSpace(c)).ToArray()); // 移除所有空白字符
+
+                                                // 调试：检查前30行的每一行，并显示单元格内容详细信息（已注释）
+                                                // Always show debug for the first 30 rows to capture header search
+                                                //if (row <= 30)
+                                                //{
+                                                //    sheetDebugInfo.AppendLine($"  Checking row {row} in Column A.");
+                                                //    sheetDebugInfo.AppendLine($"    Value Object: {(cellValueObject == null ? "null" : cellValueObject.GetType().Name)}");
+                                                //    sheetDebugInfo.AppendLine($"    ToString().Trim(): '{cellValueString}'");
+                                                //    sheetDebugInfo.AppendLine($"    After removing all whitespace: '{cellValueClean}'");
+                                                //    // Output the content of cell A for the current row with more detail and cell reference
+                                                //    //MessageBox.Show($"Sheet: {worksheet.Name}, Cell: A{row} Debug:\n" +
+                                                //    //                $"  Value Object Type: {(cellValueObject == null ? "null" : cellValueObject.GetType().Name)}\n" +
+                                                //    //                $"  ToString().Trim(): '{cellValueString}'\n" +
+                                                //    //                $"  After removing all whitespace: '{cellValueClean}'",
+                                                //    //                $"Debug: Cell A{row} Content"); // Changed title for clarity
+                                                //}
+
+                                                // 使用Trim()后的字符串或移除所有空白后的字符串进行表头匹配
+                                                if (cellValueString.Contains("序号") || cellValueString.Equals("序") ||
+                                                    cellValueClean.Contains("序号") || cellValueClean.Equals("序")) // 在A列中进行灵活匹配查找“序号”或“序”
                                                 {
-                                                    case "m":
-                                                        长度字段 = $"{内容.米数}m";
-                                                        break;
+                                                    headerRow = row;
+                                                    序号列号 = searchColumn; // 由于只检查A列，序号列号即为1
+                                                    sheetDebugInfo.AppendLine($"  使用灵活匹配在第 {row} 行，第 {序号列号} 列找到“序号”或“序”。");
+                                                    // 这里不break，如果需要，可以继续检查前30行的其他单元格内容
+                                                    // If you want to stop showing messages after finding the header, uncomment the break below.
+                                                    // break;
+                                                }
+                                            }
 
-                                                    case "mm":
-                                                        if (double.TryParse(内容.米数, out double mVal))
-                                                            长度字段 = $"{(int)Math.Round(mVal * 1000)}mm";
-                                                        else
-                                                            长度字段 = $"{内容.米数}mm";
-                                                        break;
+                                            // 如果找到表头行，继续查找其他列并提取数据
+                                            if (headerRow != -1)
+                                            {
+                                                // 根据表头行查找数据列
+                                                // 序号列号已在表头查找中找到
+                                                int 条数列 = -1;
+                                                // 移除了单个长度列变量
+                                                int 客户型号列 = -1;
+                                                int 线长列 = -1;
 
-                                                    case "IN":
-                                                    case "Ft":
-                                                        长度字段 = $"{内容.标签显示长度}{单位内容}";
-                                                        break;
+                                                // --- 修改：根据用户参考获取标签码列 ---
+                                                int 第一个长度列号 = -1; // 需要找到第一个包含“长度”或相关术语的列
+                                                List<int> 标签码列号列表 = new List<int>();
+                                                int[] 标签码列号数组 = new int[4]; // 使用数组存储4个目标列号
 
-                                                    case "m(IN)":
-                                                    case "m(Ft)":
-                                                        string 括号单位 = 单位内容 == "m(IN)" ? "IN" : "Ft";
-                                                        长度字段 = $"{内容.米数}m({内容.标签显示长度}{括号单位})";
-                                                        break;
-
-                                                    default:
-                                                        长度字段 = $"{内容.米数}m";
-                                                        break;
+                                                // 从 序号列号 + 1 开始，在表头行查找 第一个长度列号
+                                                for (int col = 序号列号 + 1; col <= worksheet.Dimension.End.Column; col++)
+                                                {
+                                                    string headerText = worksheet.Cells[headerRow, col].Text.Trim();
+                                                    // 修改：第一个长度列号的判断条件
+                                                    if (headerText.Contains("实际剪切长度(米)"))
+                                                    {
+                                                        第一个长度列号 = col;
+                                                        break; // 找到第一个长度列
+                                                    }
                                                 }
 
-                                                worksheet.Cells[rowIndex, 1].Value = seqNo++;
-                                                worksheet.Cells[rowIndex, 2].Value = 内容.标签码1;
-                                                worksheet.Cells[rowIndex, 3].Value = 内容.标签码2;
-                                                worksheet.Cells[rowIndex, 4].Value = 内容.标签码3;
-                                                worksheet.Cells[rowIndex, 5].Value = 内容.标签码4;
-                                                worksheet.Cells[rowIndex, 6].Value = ""; // 标签码5
-                                                worksheet.Cells[rowIndex, 7].Value = 内容.条数;
-                                                worksheet.Cells[rowIndex, 8].Value = 长度字段;
-                                                worksheet.Cells[rowIndex, 9].Value = string.IsNullOrWhiteSpace(内容.客户型号) ? 数据.产品型号 : 内容.客户型号;
-                                                worksheet.Cells[rowIndex, 10].Value = ""; // PO号
-                                                worksheet.Cells[rowIndex, 11].Value = ""; // 条形码
-                                                worksheet.Cells[rowIndex, 12].Value = 内容.线长;
-                                                rowIndex++;
+                                                // 填充 标签码列号列表，包含 序号列号 和 第一个长度列号 之间的列
+                                                if (序号列号 != -1 && 第一个长度列号 != -1 && 第一个长度列号 > 序号列号)
+                                                {
+                                                    for (int col = 序号列号 + 1; col < 第一个长度列号; col++)
+                                                    {
+                                                        if (col <= worksheet.Dimension.End.Column)  // 确保不超出实际列范围
+                                                        {
+                                                            标签码列号列表.Add(col);
+                                                        }
+                                                    }
+                                                }
+
+                                                // 将找到的列号复制到4元素数组中
+                                                for (int i = 0; i < Math.Min(标签码列号列表.Count, 4); i++)
+                                                {
+                                                    标签码列号数组[i] = 标签码列号列表[i];
+                                                }
+
+                                                // 如果找到的列少于4个，将数组中剩余的元素设为0
+                                                for (int i = 标签码列号列表.Count; i < 4; i++)
+                                                {
+                                                    标签码列号数组[i] = 0;
+                                                }
+
+                                                // 将结果赋给变量
+                                                int 标签码1列 = 标签码列号数组[0];
+                                                int 标签码2列 = 标签码列号数组[1];
+                                                int 标签码3列 = 标签码列号数组[2];
+                                                int 标签码4列 = 标签码列号数组[3];
+                                                // --- 结束修改标签码 ---
+
+                                                // --- 修改：查找 标签显示长度列号 ---
+                                                int 标签显示长度列号 = -1;
+
+                                                for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
+                                                {
+                                                    string headerText = worksheet.Cells[headerRow, col].Text.Trim();
+
+                                                    if (headerText.Contains("条数") || headerText.Equals("数量")) 条数列 = col; // 同时检查“数量”
+                                                    else if (headerText.Contains("客户型号")) 客户型号列 = col;
+                                                    else if (headerText.Contains("线长")) 线长列 = col;
+                                                    // 标签码列已通过其他方式查找
+
+                                                    // 修改：标签显示长度列号的判断条件
+                                                    if (headerText.Contains("标签显示长度(英寸)") || headerText.Contains("标签显示长度(英尺)") || headerText.Contains("英尺长度") || headerText.Contains("英寸长度") || headerText.Contains("Inch长度") || headerText.Contains("IN长度") || headerText.Contains("标签显示长度"))
+                                                    {
+                                                        标签显示长度列号 = col;
+                                                    }
+                                                }
+                                                // --- 结束修改标签显示长度列号 ---
+
+                                                // 检查是否找到必要列（序号列号已在表头查找中检查）
+                                                // 必要列取决于单位内容
+                                                bool essentialColumnsFound = false;
+                                                //int 长度列 = -1; // 确定用于调试输出的有效长度列 (不再需要这个变量)
+
+                                                if (单位内容 == "m" || 单位内容 == "mm")
+                                                {
+                                                    // 对于 m 或 mm，需要序号，条数，和 第一个长度列号
+                                                    if (序号列号 != -1 && 条数列 != -1 && 第一个长度列号 != -1)
+                                                    {
+                                                        essentialColumnsFound = true;
+                                                        //长度列 = 第一个长度列号; // 仅用于调试显示
+                                                    }
+                                                    sheetDebugInfo.AppendLine($"检查单位'{单位内容}'的必要列: 序号列={序号列号}, 条数列={条数列}, 第一个长度列={第一个长度列号}。 找到 = {essentialColumnsFound}");
+                                                }
+                                                else if (单位内容 == "IN" || 单位内容 == "Ft")
+                                                {
+                                                    // 对于 IN 或 Ft，需要序号，条数，和 标签显示长度列号
+                                                    if (序号列号 != -1 && 条数列 != -1 && 标签显示长度列号 != -1)
+                                                    {
+                                                        essentialColumnsFound = true;
+                                                        //长度列 = 标签显示长度列号; // 仅用于调试显示
+                                                    }
+                                                    sheetDebugInfo.AppendLine($"检查单位'{单位内容}'的必要列: 序号列={序号列号}, 条数列={条数列}, 标签显示长度列={标签显示长度列号}。 找到 = {essentialColumnsFound}");
+                                                }
+                                                else if (单位内容 == "m(IN)" || 单位内容 == "m(Ft)")
+                                                {
+                                                    // 对于 m(IN) 或 m(Ft)，需要序号，条数， 第一个长度列号，以及 标签显示长度列号
+                                                    if (序号列号 != -1 && 条数列 != -1 && 第一个长度列号 != -1 && 标签显示长度列号 != -1)
+                                                    {
+                                                        essentialColumnsFound = true;
+                                                        // 无需单一的长度列，需要同时使用两个
+                                                    }
+                                                    sheetDebugInfo.AppendLine($"检查单位'{单位内容}'的必要列: 序号列={序号列号}, 条数列={条数列}, 第一个长度列={第一个长度列号}, 标签显示长度列={标签显示长度列号}。 找到 = {essentialColumnsFound}");
+                                                }
+                                                else // 默认情况，假定基于米
+                                                {
+                                                    if (序号列号 != -1 && 条数列 != -1 && 第一个长度列号 != -1)
+                                                    {
+                                                        essentialColumnsFound = true;
+                                                        //长度列 = 第一个长度列号; // 仅用于调试显示
+                                                    }
+                                                    sheetDebugInfo.AppendLine($"检查默认单位（假定m）的必要列: 序号列={序号列号}, 条数列={条数列}, 第一个长度列={第一个长度列号}。 找到 = {essentialColumnsFound}");
+                                                }
+
+                                                if (!essentialColumnsFound)
+                                                {
+                                                    sheetDebugInfo.AppendLine("根据单位未找到必要列。 跳过此工作表的数据提取。");
+                                                    sheetDebugInfo.AppendLine($"找到的列: 序号列={序号列号}, 条数列={条数列}, 第一个长度列={第一个长度列号}, 标签显示长度列={标签显示长度列号}"); // 调试显示所有找到的长度列
+                                                    sheetDebugInfo.AppendLine($"找到的标签码列: 标签码1={标签码1列}, 标签码2={标签码2列}, 标签码3={标签码3列}, 标签码4={标签码4列}"); // 调试标签码
+                                                }
+                                                else
+                                                {
+                                                    sheetDebugInfo.AppendLine("找到必要列。 继续进行数据提取。");
+                                                    sheetDebugInfo.AppendLine($"找到的列: 序号列={序号列号}, 条数列={条数列}, 第一个长度列={第一个长度列号}, 标签显示长度列={标签显示长度列号}"); // 调试显示所有找到的长度列
+                                                    sheetDebugInfo.AppendLine($"找到的标签码列: 标签码1={标签码1列}, 标签码2={标签码2列}, 标签码3={标签码3列}, 标签码4={标签码4列}"); // 调试标签码
+
+                                                    // 提取并写入数据行
+                                                    int rowIndex = 2; // 从第2行开始写入数据
+                                                    int seqNo = 1;
+                                                    for (int row = headerRow + 1; row <= worksheet.Dimension.End.Row; row++)
+                                                    {
+                                                        string 序号 = 序号列号 > 0 ? worksheet.Cells[row, 序号列号].Text.Trim() : ""; // 使用 序号列号
+                                                        // 在“序号”列遇到空行或“Grand Total”行时停止处理
+                                                        if (string.IsNullOrEmpty(序号) || 序号.IndexOf("Grand Total", StringComparison.OrdinalIgnoreCase) >= 0 || 序号.Contains("总计") || 序号.Contains("合计"))
+                                                        {
+                                                            sheetDebugInfo.AppendLine($"由于空行或总计行，在第 {row} 行停止数据提取。");
+                                                            break;
+                                                        }
+
+                                                        string 条数 = 条数列 > 0 ? worksheet.Cells[row, 条数列].Text : "";
+
+                                                        // --- 修改：根据单位从不同的列获取原始值 ---
+                                                        // 如果 第一个长度列号 有效，始终获取米数原始值
+                                                        string 米数原始值 = (第一个长度列号 != -1) ? worksheet.Cells[row, 第一个长度列号].Text : "";
+                                                        // 如果 标签显示长度列号 有效，始终获取标签显示长度原始值
+                                                        string 标签显示长度原始值 = (标签显示长度列号 != -1) ? worksheet.Cells[row, 标签显示长度列号].Text : "";
+                                                        // --- 结束修改 ---
+
+                                                        // 使用确定的标签码列
+                                                        string 标签码1 = 标签码1列 > 0 ? worksheet.Cells[row, 标签码1列].Text.Trim() : "";
+                                                        string 标签码2 = 标签码2列 > 0 ? worksheet.Cells[row, 标签码2列].Text.Trim() : "";
+                                                        string 标签码3 = 标签码3列 > 0 ? worksheet.Cells[row, 标签码3列].Text.Trim() : "";
+                                                        string 标签码4 = 标签码4列 > 0 ? worksheet.Cells[row, 标签码4列].Text.Trim() : "";
+                                                        // 注意：标签码5列未从源文件中确定，在结果sheet中留空
+
+                                                        string 线长 = 线长列 > 0 ? worksheet.Cells[row, 线长列].Text : "";
+                                                        string 客户型号 = 客户型号列 > 0 ? worksheet.Cells[row, 客户型号列].Text : "";
+
+                                                        // 长度字段单位判断 - 修改为使用 米数原始值 和 标签显示长度原始值
+                                                        string 长度字段 = "";
+                                                        double mVal = 0;
+                                                        switch (单位内容)
+                                                        {
+                                                            case "m":
+                                                                // 对于 'm'，使用 米数原始值
+                                                                if (double.TryParse(米数原始值, out mVal))
+                                                                    长度字段 = $"{mVal}m";
+                                                                else
+                                                                    长度字段 = $"{米数原始值}m"; // 如果解析失败，使用原始值
+                                                                break;
+
+                                                            case "mm":
+                                                                // 对于 'mm'，使用 米数原始值（假定输入单位是米）
+                                                                if (double.TryParse(米数原始值, out mVal))
+                                                                    长度字段 = $"{(int)Math.Round(mVal * 1000)}mm";
+                                                                else
+                                                                    长度字段 = $"{米数原始值}mm"; // 如果解析失败，使用原始值
+                                                                break;
+
+                                                            case "IN":
+                                                            case "Ft":
+                                                                // 对于 'IN' 或 'Ft'，使用 标签显示长度原始值
+                                                                长度字段 = $"{标签显示长度原始值}{单位内容}";
+                                                                break;
+
+                                                            case "m(IN)":
+                                                                string inchUnit = "IN";
+                                                                if (double.TryParse(米数原始值, out mVal))
+                                                                    长度字段 = $"{mVal}m({标签显示长度原始值}{inchUnit})"; // 结合米数值和标签显示长度值
+                                                                else
+                                                                    长度字段 = $"{米数原始值}m({标签显示长度原始值}{inchUnit})"; // 如果解析失败，使用原始值
+                                                                break;
+
+                                                            case "m(Ft)":
+                                                                string ftUnit = "Ft";
+                                                                if (double.TryParse(米数原始值, out mVal))
+                                                                    长度字段 = $"{mVal}m({标签显示长度原始值}{ftUnit})"; // 结合米数值和标签显示长度值
+                                                                else
+                                                                    长度字段 = $"{米数原始值}m({标签显示长度原始值}{ftUnit})"; // 如果解析失败，使用原始值
+                                                                break;
+
+                                                            default:
+                                                                // 默认基于米，尝试解析 米数原始值
+                                                                if (double.TryParse(米数原始值, out mVal))
+                                                                    长度字段 = $"{mVal}m";
+                                                                else
+                                                                    长度字段 = $"{米数原始值}m"; // 如果解析失败，使用原始值
+                                                                break;
+                                                        }
+
+                                                        resultSheet.Cells[rowIndex, 1].Value = seqNo++;
+                                                        resultSheet.Cells[rowIndex, 2].Value = 标签码1;
+                                                        resultSheet.Cells[rowIndex, 3].Value = 标签码2;
+                                                        resultSheet.Cells[rowIndex, 4].Value = 标签码3;
+                                                        resultSheet.Cells[rowIndex, 5].Value = 标签码4;
+                                                        resultSheet.Cells[rowIndex, 6].Value = ""; // 标签码5
+                                                        resultSheet.Cells[rowIndex, 7].Value = 条数;
+                                                        resultSheet.Cells[rowIndex, 8].Value = 长度字段;
+                                                        resultSheet.Cells[rowIndex, 9].Value = string.IsNullOrWhiteSpace(客户型号) ? "" : 客户型号;
+                                                        resultSheet.Cells[rowIndex, 10].Value = ""; // PO号
+                                                        resultSheet.Cells[rowIndex, 11].Value = ""; // 条形码
+                                                        resultSheet.Cells[rowIndex, 12].Value = 线长;
+                                                        rowIndex++;
+                                                    }
+
+                                                    // 调试：显示提取的数据预览
+                                                    sheetDebugInfo.AppendLine($"提取了 {rowIndex - 2} 行数据。");
+                                                    if (rowIndex > 2)
+                                                    {
+                                                        sheetDebugInfo.AppendLine("前几行提取的数据:");
+                                                        int rowsToShow = Math.Min(5, rowIndex - 2);
+                                                        for (int i = 0; i < rowsToShow; i++)
+                                                        {
+                                                            sheetDebugInfo.AppendLine($"  行 {i + 1}: 序号={resultSheet.Cells[i + 2, 1].Value}, 标签码1={resultSheet.Cells[i + 2, 2].Value}, 条数={resultSheet.Cells[i + 2, 7].Value}, 长度={resultSheet.Cells[i + 2, 8].Value}");
+                                                        }
+                                                    }
+                                                }
                                             }
-                                        }
-                                    }
-                                }
-                                worksheet.Cells.AutoFitColumns();
+                                            else // headerRow 为 -1（未找到）
+                                            {
+                                                sheetDebugInfo.AppendLine($"在前 {maxRowsToSearch} 行的A列中未找到包含“序号”或“序”的表头行。此工作表未提取数据。");
+                                            }
+
+                                            // 始终显示每个已处理工作表的工作表调试信息消息框
+                                            MessageBox.Show(sheetDebugInfo.ToString(), $"工作表调试信息: {worksheet.Name ?? "未知工作表名称"}");
+                                        } // 结束 foreach worksheet
+                                    } // 结束 using srcPackage
+                                } // 结束 foreach filePath (此循环只运行一次)
+
+                                // 在所有循环外部保存包
                                 package.SaveAs(new FileInfo(savePath));
-                            }
+                            } // 结束 using package
                             MessageBox.Show($"工字标汇总已保存到: {savePath}", "完成", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
-                    }
-                }
-            }
-        }
+                        } // 结束 if saveFileDialog.ShowDialog() == DialogResult.OK
+                    } // 结束 using saveFileDialog
+                } // 结束 if folderDialog.ShowDialog() == DialogResult.OK
+            } // 结束 using folderDialog
+        } // 结束 工字标汇总_Click
 
         private void 品名汇总_Click(object sender, EventArgs e)
         {
@@ -1269,8 +1480,8 @@ namespace BarTender_Dev_Dome
                                             米数 = worksheet.Cells[row, 米数列].Text,
                                             标签码1 = 标签码1列 > 0 ? worksheet.Cells[row, 标签码1列].Text : "",
                                             标签码2 = 标签码2列 > 0 ? worksheet.Cells[row, 标签码2列].Text : "",
-                                            标签码3 = 标签码3列 > 0 ? worksheet.Cells[row, 标签码3列].Text : "",
-                                            标签码4 = 标签码4列 > 0 ? worksheet.Cells[row, 标签码4列].Text : "",
+                                            标签码3 = "",
+                                            标签码4 = "",
                                             线长 = 线长列 > 0 ? worksheet.Cells[row, 线长列].Text : "",
                                             纸箱规格 = worksheet.Cells[row, 纸箱规格列].Text,
                                             包装编码 = worksheet.Cells[row, 包装编码列].Text,
