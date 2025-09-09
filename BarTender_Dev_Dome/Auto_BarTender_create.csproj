@@ -51,10 +51,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>64656FCC2A6FD2819846C6C57978CEEEF49D7A02</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>0CE71598F764381FF1F8B37C3AA02305EB798526</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>Auto_BarTender_create_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>Auto_BarTender_create_1_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -199,6 +199,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="Auto_BarTender_create_1_TemporaryKey.pfx" />
     <None Include="Auto_BarTender_create_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

@@ -141,10 +141,10 @@
             this.contextMenuStrip_右键菜单 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.清空数据库 = new System.Windows.Forms.ToolStripMenuItem();
             this.剪切板内容到规格型号 = new System.Windows.Forms.ToolStripMenuItem();
+            this.工字标汇总 = new System.Windows.Forms.ToolStripMenuItem();
             this.品名汇总 = new System.Windows.Forms.ToolStripMenuItem();
             this.打印唛头 = new System.Windows.Forms.ToolStripMenuItem();
             this.纯附件自动 = new System.Windows.Forms.ToolStripMenuItem();
-            this.工字标汇总 = new System.Windows.Forms.ToolStripMenuItem();
             this.config_gBox.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.groupBox_数据库.SuspendLayout();
@@ -1314,6 +1314,7 @@
             this.cpxxBox.Text = "C-SFR-F22B-D24V-126-W6666-2835-F【正弯】(三面发光）(恒流)(额定功率12W)(7灯/5.56cm)(三色共挤工艺)(仅用光源中心" +
     "BIN)【带定位槽】\r\nB-硅胶注塑式前接-F22B/DTW/D2-白线-IP68-红黑Φ6.5硅胶线-1M（端部出线）(压阻水铜环)（非水下方案）\r\nB-硅胶" +
     "注塑式尾塞-F22-IP67-透明";
+            this.cpxxBox.TextChanged += new System.EventHandler(this.cpxxBox_TextChanged);
             // 
             // label5
             // 
@@ -1443,6 +1444,13 @@
             this.剪切板内容到规格型号.Text = "剪切板内容到规格型号";
             this.剪切板内容到规格型号.Click += new System.EventHandler(this.剪切板内容到规格型号_Click);
             // 
+            // 工字标汇总
+            // 
+            this.工字标汇总.Name = "工字标汇总";
+            this.工字标汇总.Size = new System.Drawing.Size(196, 22);
+            this.工字标汇总.Text = "工字标汇总";
+            this.工字标汇总.Click += new System.EventHandler(this.工字标汇总_Click);
+            // 
             // 品名汇总
             // 
             this.品名汇总.Name = "品名汇总";
@@ -1463,13 +1471,6 @@
             this.纯附件自动.Size = new System.Drawing.Size(196, 22);
             this.纯附件自动.Text = "纯备注自动";
             this.纯附件自动.Click += new System.EventHandler(this.纯备注自动_Click);
-            // 
-            // 工字标汇总
-            // 
-            this.工字标汇总.Name = "工字标汇总";
-            this.工字标汇总.Size = new System.Drawing.Size(196, 22);
-            this.工字标汇总.Text = "工字标汇总";
-            this.工字标汇总.Click += new System.EventHandler(this.工字标汇总_Click);
             // 
             // PrintForm
             // 

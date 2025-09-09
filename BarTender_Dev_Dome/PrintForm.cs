@@ -4705,7 +4705,7 @@ namespace BarTender_Dev_Dome
 
             // 正则表达式模式，
             string pattern1 = @"^(\w+-\w+-\w+)";    //灯带型号
-            string pattern2 = @"D(\d+)V";
+            string pattern2 = @"DC?(\d+)V";  // 支持新旧电压格式：D24V 或 DC24V
             string pattern21 = @"AC(\d+)V";
             //string pattern3 = @"额定功率(\d+)W";
             string pattern3 = @"额定功率(\d+(?:\.\d+)?)W";
@@ -4713,9 +4713,22 @@ namespace BarTender_Dev_Dome
             string pattern5 = @"(\d+)灯\/(\d+\.?\d*)cm";
             string pattern6 = @"-IP(\d{2})";
 
-            // 使用“-”字符分割输入字符串
+            // 使用"-"字符分割输入字符串
             string[] parts = aa.Split('-');
-            灯带材质 = parts[1];
+            
+            // 支持新旧编码格式
+            // 旧格式：C-开头-其他部分
+            // 新格式：直接开始-其他部分（少了C-开头）
+            if (parts.Length > 0 && parts[0] == "C")
+            {
+                // 旧编码格式
+                灯带材质 = parts[1];
+            }
+            else
+            {
+                // 新编码格式，第一部分就是材质信息
+                灯带材质 = parts[0];
+            }
 
             // 使用正则表达式匹配输入字符串
             Match match1 = Regex.Match(aa, pattern1);  //灯带型号
@@ -4951,7 +4964,7 @@ namespace BarTender_Dev_Dome
                 //A1617灯带型号
                 if (comboBox_标签规格.Text.Contains("Clear A1617"))
                 {
-                    string pattern = @"C-SFB-A(1617\w*)"; // 用括号捕获3525和后面的字母
+                    string pattern = @"(?:C-)?SFB-A(1617\w*)"; // 支持新旧编码格式，用括号捕获1617和后面的字母
                     Regex regex = new Regex(pattern);
                     Match match = regex.Match(cpxxBox.Text);
                     if (match.Success)
@@ -4963,7 +4976,7 @@ namespace BarTender_Dev_Dome
                 }
                 else if (comboBox_标签规格.Text.Contains("中性 A1617"))
                 {
-                    string pattern = @"C-SFB-A(1617\w*)"; // 用括号捕获3525和后面的字母
+                    string pattern = @"(?:C-)?SFB-A(1617\w*)"; // 支持新旧编码格式，用括号捕获1617和后面的字母
                     Regex regex = new Regex(pattern);
                     Match match = regex.Match(cpxxBox.Text);
                     if (match.Success)
@@ -4977,7 +4990,7 @@ namespace BarTender_Dev_Dome
                 //A2012灯带型号
                 if (cpxxBox.Text.Contains("A2012"))
                 {
-                    string pattern = @"C-SFB-A(2012\w*)";
+                    string pattern = @"(?:C-)?SFB-A(2012\w*)"; // 支持新旧编码格式
                     Regex regex = new Regex(pattern);
                     Match match = regex.Match(cpxxBox.Text);
                     if (match.Success)
@@ -4989,7 +5002,7 @@ namespace BarTender_Dev_Dome
                 }
                 else if (cpxxBox.Text.Contains("A2012"))
                 {
-                    string pattern = @"C-SFB-A(2012\w*)";
+                    string pattern = @"(?:C-)?SFB-A(2012\w*)"; // 支持新旧编码格式
                     Regex regex = new Regex(pattern);
                     Match match = regex.Match(cpxxBox.Text);
                     if (match.Success)
@@ -5240,6 +5253,8 @@ namespace BarTender_Dev_Dome
                 // 如果没有找到匹配项，则输出错误信息
                 //MessageBox.Show("未找到灯带型号匹配项。", "错误");
             }
+
+            //MessageBox.Show(voltageValue);
 
             //电压
             if (match2.Success)
@@ -7023,6 +7038,11 @@ namespace BarTender_Dev_Dome
             {
                 MessageBox.Show($"生成代码出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void cpxxBox_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
