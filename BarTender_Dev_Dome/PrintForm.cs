@@ -4704,7 +4704,7 @@ namespace BarTender_Dev_Dome
             };
 
             // 正则表达式模式，
-            string pattern1 = @"^(\w+-\w+-\w+)";    //灯带型号
+            string pattern1 = @"(?:C-)?(\w+-\w+\w)-(?:DC?|AC)\d+V";    // 灯带型号：支持新旧格式，提取前两个部分
             string pattern2 = @"DC?(\d+)V";  // 支持新旧电压格式：D24V 或 DC24V
             string pattern21 = @"AC(\d+)V";
             //string pattern3 = @"额定功率(\d+)W";
@@ -4744,6 +4744,12 @@ namespace BarTender_Dev_Dome
             {
                 // 构造输出字符串
                 string artNo = match1.Groups[1].Value; // 第一个括号匹配的内容
+                
+                // 为新编码格式添加C-前缀，保持与旧编码格式的一致性
+                if (!aa.StartsWith("C-"))
+                {
+                    artNo = "C-" + artNo;
+                }
                 //output_灯带型号 = $"ART. No.: {artNo}";
 
                 // 使用信息框输出结果
