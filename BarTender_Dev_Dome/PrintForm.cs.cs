@@ -4667,23 +4667,7 @@ namespace BarTender_Dev_Dome
             }
         }
 
-
-        private string[] 新编码补成旧编码开头(string raw)
-        {
-            // 先按 "-" 劈开
-            string[] tmp = raw.Split('-');
-
-            // 如果第一段不是 "C"，说明是新编码，在前面补一个空段，
-            // 这样新旧编码都变成：parts[0]="C"（或空），parts[1]=材质，parts[2]=型号 …
-            if (tmp.Length > 0 && tmp[0] != "C")
-            {
-                var list = new List<string>(tmp);
-                list.Insert(0, "C");   // 补成旧格式
-                tmp = list.ToArray();
-            }
-            return tmp;
-        }
-
+        
 
         //判断产品信息
         private void 判断产品信息(string aa)
@@ -4730,23 +4714,21 @@ namespace BarTender_Dev_Dome
             string pattern6 = @"-IP(\d{2})";
 
             // 使用"-"字符分割输入字符串
-            //string[] parts = aa.Split('-');
-
-            string[] parts = 新编码补成旧编码开头(aa);
+            string[] parts = aa.Split('-');
             
             // 支持新旧编码格式
             // 旧格式：C-开头-其他部分
             // 新格式：直接开始-其他部分（少了C-开头）
-            //if (parts.Length > 0 && parts[0] == "C")
-            //{
-            //    // 旧编码格式
-            //    灯带材质 = parts[1];
-            //}
-            //else
-            //{
-            //    // 新编码格式，第一部分就是材质信息
-            //    灯带材质 = parts[0];
-            //}
+            if (parts.Length > 0 && parts[0] == "C")
+            {
+                // 旧编码格式
+                灯带材质 = parts[1];
+            }
+            else
+            {
+                // 新编码格式，第一部分就是材质信息
+                灯带材质 = parts[0];
+            }
 
             // 使用正则表达式匹配输入字符串
             Match match1 = Regex.Match(aa, pattern1);  //灯带型号
@@ -4764,11 +4746,10 @@ namespace BarTender_Dev_Dome
                 string artNo = match1.Groups[1].Value; // 第一个括号匹配的内容
                 
                 // 为新编码格式添加C-前缀，保持与旧编码格式的一致性
-                //if (!aa.StartsWith("C-"))
-                //{
-                //    artNo = "C-" + artNo;
-                //}
-                artNo = "C-" + artNo;
+                if (!aa.StartsWith("C-"))
+                {
+                    artNo = "C-" + artNo;
+                }
                 //output_灯带型号 = $"ART. No.: {artNo}";
 
                 // 使用信息框输出结果
