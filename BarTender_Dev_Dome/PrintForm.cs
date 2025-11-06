@@ -4532,10 +4532,19 @@ namespace BarTender_Dev_Dome
                 bool hasSideBend = input.Contains("侧弯");
 
                 string secondField = hasPositiveBend ? "正弯" : (hasSideBend ? "侧弯" : string.Empty);
-                if (!string.IsNullOrEmpty(secondField))
+
+                //2025.11.6增加不要侧弯显示
+                var models11 = new[] { "F10", "F11", "F15", "F21"}; // 侧弯型号
+                bool isSideBend11 = models11.Any(model11 => input.Contains(model11));
+                if (isSideBend11)
                 {
-                    return $"{secondField}.png";
+                    return $"空.png";
                 }
+
+                //if (!string.IsNullOrEmpty(secondField))
+                //{
+                //    return $"{secondField}.png";
+                //}
                 else if (标签规格.Contains("RCM") || 标签规格.Contains("13013"))
                 {
                     // 如果包含"RCM"，检查output_灯带型号的文本
@@ -4637,7 +4646,7 @@ namespace BarTender_Dev_Dome
                 //MessageBox.Show(secondField, "操作提示");
 
                 //2025.11.6增加不要侧弯显示
-                var models11 = new[] { "F10", "F11", "F15", "F21", "F2222" }; // 侧弯型号
+                var models11 = new[] { "F10", "F11", "F15", "F21"}; // 侧弯型号
                 bool isSideBend11 = models11.Any(model11 => input.Contains(model11));
                 if (isSideBend11)
                 {
