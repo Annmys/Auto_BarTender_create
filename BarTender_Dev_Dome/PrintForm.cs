@@ -4544,6 +4544,7 @@ namespace BarTender_Dev_Dome
                     bool isSideBend = models.Any(model => input.Contains(model));
                     bool isSideBend1 = models1.Any(model => input.Contains(model));
                     //bool isSideBend1 = models1.Any(model => input.Contains(model));
+                    // 如果是侧弯型号，直接返回只包含firstField的格式
                     // 如果是特定的型号，则默认为侧弯
                     if (isSideBend)
                     {
@@ -4594,6 +4595,11 @@ namespace BarTender_Dev_Dome
                     bool isSideBend = models.Any(model => input.Contains(model));
                     bool isSideBend1 = models1.Any(model => input.Contains(model));
                     //bool isSideBend1 = models1.Any(model => input.Contains(model));
+                    // 如果是侧弯型号，直接返回只包含firstField的格式
+                    if (isSideBend)
+                    {
+                        return $"{firstField}.png";
+                    }
                     // 如果是特定的型号，则默认为侧弯
                     if (isSideBend)
                     {
@@ -4630,11 +4636,19 @@ namespace BarTender_Dev_Dome
                 string secondField = hasPositiveBend ? "正弯" : (hasSideBend ? "侧弯" : string.Empty);
                 //MessageBox.Show(secondField, "操作提示");
 
-                // 构建结果
-                if (!string.IsNullOrEmpty(secondField))
+                //2025.11.6增加不要侧弯显示
+                var models11 = new[] { "F10", "F11", "F15", "F21", "F2222" }; // 侧弯型号
+                bool isSideBend11 = models11.Any(model11 => input.Contains(model11));
+                if (isSideBend11)
                 {
-                    return $"{firstField}-{secondField}.png";
+                    return $"{firstField}.png";
                 }
+
+                // 构建结果
+                //if (!string.IsNullOrEmpty(secondField))
+                //{
+                //    return $"{firstField}-{secondField}.png";
+                //}
                 else if (标签规格.Contains("RCM") || 标签规格.Contains("13013"))
                 {
                     // 如果包含"RCM"，检查output_灯带型号的文本
@@ -4643,6 +4657,11 @@ namespace BarTender_Dev_Dome
                     bool isSideBend = models.Any(model => input.Contains(model));
                     bool isSideBend1 = models1.Any(model => input.Contains(model));
                     //bool isSideBend1 = models1.Any(model => input.Contains(model));
+                    if (isSideBend)
+                    {
+                        return $"{firstField}.png";
+                    }
+
                     // 如果是特定的型号，则默认为侧弯
                     if (isSideBend)
                     {
