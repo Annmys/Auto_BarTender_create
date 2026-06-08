@@ -518,7 +518,10 @@ namespace BarTender_Dev_Dome
                     {
                         // 获取文件夹名称并添加到ComboBox中
                         string folderName = Path.GetFileName(directory);
-                        comboBox_标签规格.Items.Add(folderName);
+                        if (应显示当前标签规格(folderName))
+                        {
+                            comboBox_标签规格.Items.Add(folderName);
+                        }
                     }
                 }
                 else
@@ -545,7 +548,10 @@ namespace BarTender_Dev_Dome
                     {
                         // 获取文件夹名称并添加到ComboBox中
                         string folderName = Path.GetFileName(directory);
-                        comboBox_标签规格.Items.Add(folderName);
+                        if (应显示当前标签规格(folderName))
+                        {
+                            comboBox_标签规格.Items.Add(folderName);
+                        }
                     }
                 }
                 else
@@ -573,7 +579,10 @@ namespace BarTender_Dev_Dome
                     {
                         // 获取文件夹名称并添加到ComboBox中
                         string folderName = Path.GetFileName(directory);
-                        comboBox_标签规格.Items.Add(folderName);
+                        if (应显示当前标签规格(folderName))
+                        {
+                            comboBox_标签规格.Items.Add(folderName);
+                        }
                     }
                 }
                 else
@@ -582,6 +591,55 @@ namespace BarTender_Dev_Dome
                     MessageBox.Show("文件夹不存在。");
                 }
             }
+        }
+
+        private bool 应显示当前标签规格(string folderName)
+        {
+            if (标签种类_comboBox.Text == "工字标" || 标签种类_comboBox.Text == "品名标")
+            {
+                return folderName.Contains("12251客户") || folderName.Contains("19079客户");
+            }
+
+            return true;
+        }
+
+        private string 生成12251EWM内容(string 客户型号, string po号)
+        {
+            return $"{(客户型号 ?? string.Empty).Trim()},{(po号 ?? string.Empty).Trim()}";
+        }
+
+        private string 查找12251资料(string chazhaoziliao, int resultColumn)
+        {
+            string excelPath1 = @"\\192.168.1.33\Annmy\订单标签自动生成软件\sucai\12251资料.xlsx";
+
+            try
+            {
+                using (var package1 = new ExcelPackage(new FileInfo(excelPath1)))
+                {
+                    var worksheet1 = package1.Workbook.Worksheets[0];
+                    int rowCount1 = worksheet1.Dimension.Rows;
+
+                    for (int row1 = 1; row1 <= rowCount1; row1++)
+                    {
+                        for (int col = 1; col <= 4; col++)
+                        {
+                            string cellValue = worksheet1.Cells[row1, col].Text;
+                            if (cellValue == chazhaoziliao)
+                            {
+                                return worksheet1.Cells[row1, resultColumn].Text;
+                            }
+                        }
+                    }
+                }
+
+                MessageBox.Show($"在A、B、C、D列中均未找到匹配内容: {chazhaoziliao}", "查找结果");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"发生错误：\n{ex.Message}", "错误");
+            }
+
+            return string.Empty;
         }
 
         //软件开启加载标签种类
@@ -873,6 +931,11 @@ namespace BarTender_Dev_Dome
                         }
                         else { _wjm_ = "1.btw"; }
                     }
+                    if (comboBox_标签规格.Text.Contains("12251"))
+                    {
+                        // 12251模板新增二维码字段，改用2.btw。
+                        _wjm_ = "2.btw";
+                    }
                 }
                 else
                 {
@@ -890,6 +953,11 @@ namespace BarTender_Dev_Dome
                 if (checkBox_标识码02.Checked) { _wjm_ = "1.btw"; }
                 if (checkBox_标识码03.Checked) { _wjm_ = "3.btw"; }
                 if (checkBox_标识码04.Checked) { _wjm_ = "4.btw"; }
+                if (comboBox_标签规格.Text.Contains("12251"))
+                {
+                    // 保留上方原有标识码模板判断，12251最终统一使用2.btw。
+                    _wjm_ = "2.btw";
+                }
 
                 模板地址 = _btw_path + @"\" + _wjm_;
                 //MessageBox.Show(模板地址, "操作提示");
@@ -984,12 +1052,14 @@ namespace BarTender_Dev_Dome
                         {
                             labelFormat.SubStrings.SetSubString("CPCD", textBox_剪切长度.Text);
                             labelFormat.SubStrings.SetSubString("CPXX-2", textBox_客户资料.Text);
+                            labelFormat.SubStrings.SetSubString("EWM", 生成12251EWM内容(textBox_客户资料.Text, textBox_po号2.Text));
                             if (灯带材质 == "FR") { labelFormat.SubStrings.SetSubString("IPDJ", " "); }
                             else { labelFormat.SubStrings.SetSubString("IPDJ", "Not suitable for underwater use"); }
                         }
                         else if (comboBox_标签规格.Text.Contains("12251") && 标签种类_comboBox.Text.Contains("品名标"))
                         {
                             labelFormat.SubStrings.SetSubString("CPXX-2", textBox_客户资料.Text);
+                            labelFormat.SubStrings.SetSubString("EWM", 生成12251EWM内容(textBox_客户资料.Text, textBox_po号2.Text));
                             string 处理后色温 = output_色温.Replace("Color: ", "");
                             labelFormat.SubStrings.SetSubString("SW", 处理后色温);
                             string 处理后功率 = output_功率.Replace("Rated Power: ", ""); // 删除前缀
@@ -1539,6 +1609,7 @@ namespace BarTender_Dev_Dome
                                         labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
                                         labelFormat.SubStrings.SetSubString("CPCD", h2Data);
                                         labelFormat.SubStrings.SetSubString("CPXX-2", i2Data);
+                                        labelFormat.SubStrings.SetSubString("EWM", 生成12251EWM内容(i2Data, j2Data));
                                         if (灯带材质 == "FR") { labelFormat.SubStrings.SetSubString("IPDJ", " "); }
                                         else { labelFormat.SubStrings.SetSubString("IPDJ", "Not suitable for underwater use"); }
                                     }
@@ -1594,6 +1665,7 @@ namespace BarTender_Dev_Dome
                                         labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
                                         labelFormat.SubStrings.SetSubString("CPCD", h2Data);
                                         labelFormat.SubStrings.SetSubString("CPXX-2", i2Data);
+                                        labelFormat.SubStrings.SetSubString("EWM", 生成12251EWM内容(i2Data, j2Data));
                                         string 处理后色温 = output_色温.Replace("Color: ", "");
                                         string 处理后功率 = output_功率.Replace("Rated Power: ", ""); // 删除前缀
                                         int 斜杠位置 = 处理后功率.IndexOf("/");
@@ -2154,6 +2226,44 @@ namespace BarTender_Dev_Dome
                                             else if (artNo.Contains("3525")) { labelFormat.SubStrings.SetSubString("IPDJ", "IP67"); labelFormat.SubStrings.SetSubString("CPCD", " "); }
                                             else { labelFormat.SubStrings.SetSubString("IPDJ", "IP68"); labelFormat.SubStrings.SetSubString("CPCD", "1M"); }
                                         }
+                                    }
+                                    else if (comboBox_标签规格.Text.Contains("12251") && 标签种类_comboBox.Text.Contains("工字标"))
+                                    {
+                                        string fColumnContent = 查找12251资料(i2Data, 6);
+                                        if (!string.IsNullOrEmpty(fColumnContent))
+                                        {
+                                            name_CPXXBox.Text = fColumnContent;
+                                        }
+
+                                        labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+                                        labelFormat.SubStrings.SetSubString("CPCD", h2Data);
+                                        labelFormat.SubStrings.SetSubString("CPXX-2", i2Data);
+                                        labelFormat.SubStrings.SetSubString("EWM", 生成12251EWM内容(i2Data, j2Data));
+                                        if (灯带材质 == "FR") { labelFormat.SubStrings.SetSubString("IPDJ", " "); }
+                                        else { labelFormat.SubStrings.SetSubString("IPDJ", "Not suitable for underwater use"); }
+                                    }
+                                    else if (comboBox_标签规格.Text.Contains("12251") && 标签种类_comboBox.Text.Contains("品名标"))
+                                    {
+                                        string fColumnContent = 查找12251资料(i2Data, 5);
+                                        if (!string.IsNullOrEmpty(fColumnContent))
+                                        {
+                                            name_CPXXBox.Text = fColumnContent;
+                                        }
+
+                                        labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+                                        labelFormat.SubStrings.SetSubString("CPCD", h2Data);
+                                        labelFormat.SubStrings.SetSubString("CPXX-2", i2Data);
+                                        labelFormat.SubStrings.SetSubString("EWM", 生成12251EWM内容(i2Data, j2Data));
+                                        string 处理后色温 = output_色温.Replace("Color: ", "");
+                                        labelFormat.SubStrings.SetSubString("SW", 处理后色温);
+                                        string 处理后功率 = output_功率.Replace("Rated Power: ", ""); // 删除前缀
+                                        int 斜杠位置 = 处理后功率.IndexOf("/");
+                                        if (斜杠位置 != -1)
+                                        {
+                                            处理后功率 = 处理后功率.Substring(0, 斜杠位置); // 只保留斜杠前的部分
+                                        }
+                                        labelFormat.SubStrings.SetSubString("WS", 处理后功率);
+                                        labelFormat.SubStrings.SetSubString("PO", j2Data);
                                     }
                                     break;
 
@@ -3494,6 +3604,7 @@ namespace BarTender_Dev_Dome
                                                     labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
                                                     labelFormat.SubStrings.SetSubString("CPCD", hData);
                                                     labelFormat.SubStrings.SetSubString("CPXX-2", iData);
+                                                    labelFormat.SubStrings.SetSubString("EWM", 生成12251EWM内容(iData, jData));
                                                     if (灯带材质 == "FR") { labelFormat.SubStrings.SetSubString("IPDJ", " "); }
                                                     else { labelFormat.SubStrings.SetSubString("IPDJ", "Not suitable for underwater use"); }
                                                 }
@@ -3549,6 +3660,7 @@ namespace BarTender_Dev_Dome
                                                     labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
                                                     labelFormat.SubStrings.SetSubString("CPCD", hData);
                                                     labelFormat.SubStrings.SetSubString("CPXX-2", iData);
+                                                    labelFormat.SubStrings.SetSubString("EWM", 生成12251EWM内容(iData, jData));
                                                     string 处理后色温 = output_色温.Replace("Color: ", "");
                                                     string 处理后功率 = output_功率.Replace("Rated Power: ", ""); // 删除前缀
                                                     int 斜杠位置 = 处理后功率.IndexOf("/");
@@ -4119,6 +4231,44 @@ namespace BarTender_Dev_Dome
                                                         else if (artNo.Contains("3525")) { labelFormat.SubStrings.SetSubString("IPDJ", "IP67"); labelFormat.SubStrings.SetSubString("CPCD", " "); }
                                                         else { labelFormat.SubStrings.SetSubString("IPDJ", "IP68"); labelFormat.SubStrings.SetSubString("CPCD", "1M"); }
                                                     }
+                                                }
+                                                else if (comboBox_标签规格.Text.Contains("12251") && 标签种类_comboBox.Text.Contains("工字标"))
+                                                {
+                                                    string fColumnContent = 查找12251资料(iData, 6);
+                                                    if (!string.IsNullOrEmpty(fColumnContent))
+                                                    {
+                                                        name_CPXXBox.Text = fColumnContent;
+                                                    }
+
+                                                    labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+                                                    labelFormat.SubStrings.SetSubString("CPCD", hData);
+                                                    labelFormat.SubStrings.SetSubString("CPXX-2", iData);
+                                                    labelFormat.SubStrings.SetSubString("EWM", 生成12251EWM内容(iData, jData));
+                                                    if (灯带材质 == "FR") { labelFormat.SubStrings.SetSubString("IPDJ", " "); }
+                                                    else { labelFormat.SubStrings.SetSubString("IPDJ", "Not suitable for underwater use"); }
+                                                }
+                                                else if (comboBox_标签规格.Text.Contains("12251") && 标签种类_comboBox.Text.Contains("品名标"))
+                                                {
+                                                    string fColumnContent = 查找12251资料(iData, 5);
+                                                    if (!string.IsNullOrEmpty(fColumnContent))
+                                                    {
+                                                        name_CPXXBox.Text = fColumnContent;
+                                                    }
+
+                                                    labelFormat.SubStrings.SetSubString("CPXX", name_CPXXBox.Text);
+                                                    labelFormat.SubStrings.SetSubString("CPCD", hData);
+                                                    labelFormat.SubStrings.SetSubString("CPXX-2", iData);
+                                                    labelFormat.SubStrings.SetSubString("EWM", 生成12251EWM内容(iData, jData));
+                                                    string 处理后色温 = output_色温.Replace("Color: ", "");
+                                                    labelFormat.SubStrings.SetSubString("SW", 处理后色温);
+                                                    string 处理后功率 = output_功率.Replace("Rated Power: ", ""); // 删除前缀
+                                                    int 斜杠位置 = 处理后功率.IndexOf("/");
+                                                    if (斜杠位置 != -1)
+                                                    {
+                                                        处理后功率 = 处理后功率.Substring(0, 斜杠位置); // 只保留斜杠前的部分
+                                                    }
+                                                    labelFormat.SubStrings.SetSubString("WS", 处理后功率);
+                                                    labelFormat.SubStrings.SetSubString("PO", jData);
                                                 }
                                                 // 设置打印机名称
                                                 labelFormat.PrintSetup.PrinterName = _PrinterName;
