@@ -597,7 +597,7 @@ namespace BarTender_Dev_Dome
         {
             if (标签种类_comboBox.Text == "工字标" || 标签种类_comboBox.Text == "品名标")
             {
-                return folderName.Contains("12251客户") || folderName.Contains("19079客户");
+                return folderName.Contains("12251") || folderName.Contains("19079");
             }
 
             return true;
