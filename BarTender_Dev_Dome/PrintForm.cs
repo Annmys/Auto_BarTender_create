@@ -6885,7 +6885,6 @@ namespace BarTender_Dev_Dome
                     if (运行19079二维码PDF拆分(dialog.FileName, outputDirectory))
                     {
                         MessageBox.Show("19079二维码PDF拆分完成！", "成功");
-                        预览第一个PDF标签();
                     }
                     else
                     {
