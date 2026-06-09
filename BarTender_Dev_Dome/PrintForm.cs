@@ -648,7 +648,7 @@ namespace BarTender_Dev_Dome
 
         private bool 当前标签规格是19079()
         {
-            return comboBox_标签规格.Text.Contains("19079");
+            return comboBox_标签规格.Text.Contains("19079") || comboBox_标签规格.Text.Contains("二维码");
         }
 
         private string 获取当前型号类型()
@@ -6884,7 +6884,8 @@ namespace BarTender_Dev_Dome
 
                     if (运行19079二维码PDF拆分(dialog.FileName, outputDirectory))
                     {
-                        MessageBox.Show("19079二维码PDF拆分完成！", "成功");
+                        int splitCount = Directory.GetFiles(outputDirectory, "*.pdf").Length;
+                        MessageBox.Show($"19079二维码PDF拆分完成，共拆分 {splitCount} 个PDF。", "成功");
                     }
                     else
                     {
