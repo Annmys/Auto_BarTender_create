@@ -707,16 +707,25 @@ namespace BarTender_Dev_Dome
 
         private bool 运行19079二维码PDF拆分(string inputPdf, string outputDirectory)
         {
+            string exePath = Path.Combine(Application.StartupPath, "split_qr_pdf.exe");
             string scriptPath = Path.Combine(Application.StartupPath, "split_qr_pdf.py");
-            if (!File.Exists(scriptPath))
+            if (!File.Exists(exePath) && !File.Exists(scriptPath))
             {
-                MessageBox.Show("未找到二维码拆分脚本: " + scriptPath, "错误");
+                MessageBox.Show("未找到二维码拆分程序，请确认 split_qr_pdf.exe 与主程序在同一目录。", "错误");
                 return false;
             }
 
             ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = "python.exe";
-            startInfo.Arguments = $"\"{scriptPath}\" \"{inputPdf}\" \"{outputDirectory}\"";
+            if (File.Exists(exePath))
+            {
+                startInfo.FileName = exePath;
+                startInfo.Arguments = $"\"{inputPdf}\" \"{outputDirectory}\"";
+            }
+            else
+            {
+                startInfo.FileName = "python.exe";
+                startInfo.Arguments = $"\"{scriptPath}\" \"{inputPdf}\" \"{outputDirectory}\"";
+            }
             startInfo.UseShellExecute = false;
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
@@ -730,7 +739,7 @@ namespace BarTender_Dev_Dome
                     string error = process.StandardError.ReadToEnd();
                     process.WaitForExit();
 
-                    if (process.ExitCode != 0 || !string.IsNullOrWhiteSpace(error))
+                    if (process.ExitCode != 0)
                     {
                         MessageBox.Show($"二维码PDF拆分失败：{error}\n{output}", "错误");
                         return false;
