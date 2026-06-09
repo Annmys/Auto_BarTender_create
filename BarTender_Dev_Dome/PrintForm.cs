@@ -661,10 +661,28 @@ namespace BarTender_Dev_Dome
 
         private string 获取当前PDF标签模板路径()
         {
-            return Path.Combine(
+            string basePath = Path.Combine(
                 @"\\192.168.1.33\Annmy\订单标签自动生成软件\moban",
                 标签种类_comboBox.Text,
-                获取当前型号类型(),
+                获取当前型号类型());
+
+            if (当前标签规格是19079() && Directory.Exists(basePath))
+            {
+                string qrSpecDirectory = Directory.GetDirectories(basePath)
+                    .FirstOrDefault(path =>
+                    {
+                        string folderName = Path.GetFileName(path);
+                        return folderName.Contains("19079") && folderName.Contains("二维码");
+                    });
+
+                if (!string.IsNullOrEmpty(qrSpecDirectory))
+                {
+                    return Path.Combine(qrSpecDirectory, "1.btw");
+                }
+            }
+
+            return Path.Combine(
+                basePath,
                 comboBox_标签规格.Text,
                 "1.btw");
         }
@@ -802,7 +820,7 @@ namespace BarTender_Dev_Dome
                     using (Engine btEngine = new Engine(true))
                     {
                         LabelFormatDocument labelFormat = btEngine.Documents.Open(获取当前PDF标签模板路径());
-                        labelFormat.SubStrings.SetSubString("PDF", pdfFilePath);
+                        labelFormat.SubStrings.SetSubString("PDF", fileName);
                         labelFormat.SubStrings.SetSubString("XLH", pageNumber);
                         labelFormat.ExportImageToFile(_bmp_path, ImageType.BMP, Seagull.BarTender.Print.ColorDepth.ColorDepth24bit, new Resolution(407, 407), OverwriteOptions.Overwrite);
                     }
@@ -7052,7 +7070,7 @@ namespace BarTender_Dev_Dome
                             {
                                 string pdfFilePath = pdfFiles[i];
                                 string pdfFileName = Path.GetFileName(pdfFilePath);
-                                labelFormat.SubStrings.SetSubString("PDF", pdfFilePath);
+                                labelFormat.SubStrings.SetSubString("PDF", pdfFileName);
 
                                 string pageNumber = Regex.Match(pdfFileName, @"page_(\d+)\.pdf").Groups[1].Value;
                                 labelFormat.SubStrings.SetSubString("XLH", pageNumber);
@@ -7082,7 +7100,7 @@ namespace BarTender_Dev_Dome
                             string pdfFilePath = pdfFiles[i];
                             string pdfFileName = Path.GetFileName(pdfFilePath);
                             string pageNumber = Regex.Match(pdfFileName, @"page_(\d+)\.pdf").Groups[1].Value;
-                            labelFormat.SubStrings.SetSubString("PDF", pdfFilePath);
+                            labelFormat.SubStrings.SetSubString("PDF", pdfFileName);
                             labelFormat.SubStrings.SetSubString("XLH", pageNumber);
 
                             for (int j = 0; j < 次数; j++)
