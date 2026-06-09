@@ -318,7 +318,11 @@ namespace BarTender_Dev_Dome
         private void preview_btn_Click(object sender, EventArgs e)
         {
             //if (标签种类_comboBox.Text == "工字标" || 标签种类_comboBox.Text == "品名标") { PrintBar(true); }
-            if (标签种类_comboBox.Text == "工字标" || 标签种类_comboBox.Text == "品名标") { shengcheng_biaoqian(biaoqian.yulan); }
+            if (标签种类_comboBox.Text == "工字标" || 标签种类_comboBox.Text == "品名标")
+            {
+                if (当前标签规格是19079()) { 预览第一个PDF标签(); }
+                else { shengcheng_biaoqian(biaoqian.yulan); }
+            }
 
             if (标签种类_comboBox.Text == "唛头")
             {
@@ -729,22 +733,14 @@ namespace BarTender_Dev_Dome
             try
             {
                 string pdfSplitDirectory = Path.Combine(Application.StartupPath + @"\PDF拆分");
-                string firstPdf = Directory.GetFiles(pdfSplitDirectory, "*.pdf")
-                    .Select(Path.GetFileName)
-                    .OrderBy(fileName => int.Parse(fileName.Substring(5, fileName.Length - 9)))
-                    .FirstOrDefault();
+                var pdfFiles = Directory.GetFiles(pdfSplitDirectory, "*.pdf")
+                    .OrderBy(fileName => int.Parse(Path.GetFileNameWithoutExtension(fileName).Replace("page_", "")))
+                    .ToList();
 
-                if (string.IsNullOrEmpty(firstPdf))
+                if (pdfFiles.Count == 0)
                 {
                     MessageBox.Show("没有可预览的拆分PDF。", "操作提示");
                     return;
-                }
-
-                using (Engine btEngine = new Engine(true))
-                {
-                    LabelFormatDocument labelFormat = btEngine.Documents.Open(获取当前PDF标签模板路径());
-                    labelFormat.SubStrings.SetSubString("PDF", firstPdf);
-                    labelFormat.ExportImageToFile(_bmp_path, ImageType.BMP, Seagull.BarTender.Print.ColorDepth.ColorDepth24bit, new Resolution(407, 407), OverwriteOptions.Overwrite);
                 }
 
                 Form previewForm = new Form
@@ -766,6 +762,28 @@ namespace BarTender_Dev_Dome
                     BackColor = Color.White
                 };
 
+                Button prevButton = new Button
+                {
+                    Text = "上一个",
+                    Location = new Point(120, 10),
+                    Size = new Size(80, 30)
+                };
+
+                Button nextButton = new Button
+                {
+                    Text = "下一个",
+                    Location = new Point(210, 10),
+                    Size = new Size(80, 30)
+                };
+
+                Label rowIndicator = new Label
+                {
+                    Text = $"标签: 1/{pdfFiles.Count}",
+                    Location = new Point(300, 15),
+                    Size = new Size(160, 20),
+                    TextAlign = ContentAlignment.MiddleLeft
+                };
+
                 Button closeButton = new Button
                 {
                     Text = "关闭预览",
@@ -774,11 +792,58 @@ namespace BarTender_Dev_Dome
                 };
                 closeButton.Click += (s, args) => previewForm.Close();
 
-                System.Drawing.Image image = System.Drawing.Image.FromFile(_bmp_path);
-                pictureBox.Image = new Bitmap(image);
-                image.Dispose();
+                int currentIndex = 0;
+                Action<int> loadPreview = (index) =>
+                {
+                    string pdfFilePath = pdfFiles[index];
+                    string fileName = Path.GetFileName(pdfFilePath);
+                    string pageNumber = Regex.Match(fileName, @"page_(\d+)\.pdf").Groups[1].Value;
+
+                    using (Engine btEngine = new Engine(true))
+                    {
+                        LabelFormatDocument labelFormat = btEngine.Documents.Open(获取当前PDF标签模板路径());
+                        labelFormat.SubStrings.SetSubString("PDF", pdfFilePath);
+                        labelFormat.SubStrings.SetSubString("XLH", pageNumber);
+                        labelFormat.ExportImageToFile(_bmp_path, ImageType.BMP, Seagull.BarTender.Print.ColorDepth.ColorDepth24bit, new Resolution(407, 407), OverwriteOptions.Overwrite);
+                    }
+
+                    if (pictureBox.Image != null)
+                    {
+                        pictureBox.Image.Dispose();
+                        pictureBox.Image = null;
+                    }
+
+                    System.Drawing.Image image = System.Drawing.Image.FromFile(_bmp_path);
+                    pictureBox.Image = new Bitmap(image);
+                    image.Dispose();
+
+                    rowIndicator.Text = $"标签: {index + 1}/{pdfFiles.Count}";
+                    prevButton.Enabled = index > 0;
+                    nextButton.Enabled = index < pdfFiles.Count - 1;
+                };
+
+                prevButton.Click += (s, args) =>
+                {
+                    if (currentIndex > 0)
+                    {
+                        currentIndex--;
+                        loadPreview(currentIndex);
+                    }
+                };
+
+                nextButton.Click += (s, args) =>
+                {
+                    if (currentIndex < pdfFiles.Count - 1)
+                    {
+                        currentIndex++;
+                        loadPreview(currentIndex);
+                    }
+                };
 
                 previewForm.Controls.Add(closeButton);
+                previewForm.Controls.Add(prevButton);
+                previewForm.Controls.Add(nextButton);
+                previewForm.Controls.Add(rowIndicator);
                 previewForm.Controls.Add(pictureBox);
                 previewForm.FormClosed += (s, args) =>
                 {
@@ -788,6 +853,7 @@ namespace BarTender_Dev_Dome
                         pictureBox.Image = null;
                     }
                 };
+                loadPreview(currentIndex);
                 previewForm.Show();
             }
             catch (Exception ex)
@@ -6956,8 +7022,7 @@ namespace BarTender_Dev_Dome
                     }
 
                     var pdfFiles = Directory.GetFiles(pdfSplitDirectory, "*.pdf")
-                      .Select(Path.GetFileName)
-                      .OrderBy(fileName => int.Parse(fileName.Substring(5, fileName.Length - 9)))
+                      .OrderBy(fileName => int.Parse(Path.GetFileNameWithoutExtension(fileName).Replace("page_", "")))
                       .ToList();
 
                     if (pdfFiles.Count == 0)
@@ -6985,10 +7050,12 @@ namespace BarTender_Dev_Dome
 
                             for (int i = 0; i < pdfFiles.Count; i++)
                             {
-                                string pdfFileName = pdfFiles[i];
-                                labelFormat.SubStrings.SetSubString("PDF", pdfFileName);
+                                string pdfFilePath = pdfFiles[i];
+                                string pdfFileName = Path.GetFileName(pdfFilePath);
+                                labelFormat.SubStrings.SetSubString("PDF", pdfFilePath);
 
                                 string pageNumber = Regex.Match(pdfFileName, @"page_(\d+)\.pdf").Groups[1].Value;
+                                labelFormat.SubStrings.SetSubString("XLH", pageNumber);
                                 int excelRow = 2 + int.Parse(pageNumber) - 1;
 
                                 if (excelRow >= 2 && excelRow <= worksheet.Dimension.End.Row)
@@ -7012,8 +7079,11 @@ namespace BarTender_Dev_Dome
                     {
                         for (int i = 0; i < pdfFiles.Count; i++)
                         {
-                            string pdfFileName = pdfFiles[i];
-                            labelFormat.SubStrings.SetSubString("PDF", pdfFileName);
+                            string pdfFilePath = pdfFiles[i];
+                            string pdfFileName = Path.GetFileName(pdfFilePath);
+                            string pageNumber = Regex.Match(pdfFileName, @"page_(\d+)\.pdf").Groups[1].Value;
+                            labelFormat.SubStrings.SetSubString("PDF", pdfFilePath);
+                            labelFormat.SubStrings.SetSubString("XLH", pageNumber);
 
                             for (int j = 0; j < 次数; j++)
                             {
