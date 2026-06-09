@@ -145,6 +145,8 @@
             this.品名汇总 = new System.Windows.Forms.ToolStripMenuItem();
             this.打印唛头 = new System.Windows.Forms.ToolStripMenuItem();
             this.纯附件自动 = new System.Windows.Forms.ToolStripMenuItem();
+            this.label24 = new System.Windows.Forms.Label();
+            this.XLH19079 = new System.Windows.Forms.TextBox();
             this.config_gBox.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.groupBox_数据库.SuspendLayout();
@@ -999,6 +1001,8 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.label24);
+            this.tabPage2.Controls.Add(this.XLH19079);
             this.tabPage2.Controls.Add(this.label23);
             this.tabPage2.Controls.Add(this.textBox_线长);
             this.tabPage2.Controls.Add(this.label22);
@@ -1471,7 +1475,28 @@
             this.纯附件自动.Size = new System.Drawing.Size(196, 22);
             this.纯附件自动.Text = "纯备注自动";
             this.纯附件自动.Click += new System.EventHandler(this.纯备注自动_Click);
-            // 
+            //
+            // label24
+            //
+            this.label24.AutoSize = true;
+            this.label24.ForeColor = System.Drawing.Color.Red;
+            this.label24.Location = new System.Drawing.Point(15, 132);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(119, 12);
+            this.label24.TabIndex = 162;
+            this.label24.Text = "19079拆分PDF序列号:";
+            //
+            // XLH19079
+            //
+            this.XLH19079.Font = new System.Drawing.Font("宋体", 11F);
+            this.XLH19079.ForeColor = System.Drawing.Color.Black;
+            this.XLH19079.Location = new System.Drawing.Point(140, 124);
+            this.XLH19079.Multiline = true;
+            this.XLH19079.Name = "XLH19079";
+            this.XLH19079.Size = new System.Drawing.Size(179, 29);
+            this.XLH19079.TabIndex = 161;
+            this.XLH19079.TextChanged += new System.EventHandler(this.XLH19079_TextChanged);
+            //
             // PrintForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -1633,5 +1658,7 @@
         private System.Windows.Forms.Button button_AI;
         private System.Windows.Forms.ToolStripMenuItem 品名汇总;
         private System.Windows.Forms.ToolStripMenuItem 工字标汇总;
+        private System.Windows.Forms.Label label24;
+        private System.Windows.Forms.TextBox XLH19079;
     }
 }

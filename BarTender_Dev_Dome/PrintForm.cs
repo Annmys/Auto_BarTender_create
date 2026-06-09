@@ -755,6 +755,12 @@ namespace BarTender_Dev_Dome
             return Directory.GetFiles(outputDirectory, "*.pdf").Length > 0;
         }
 
+        private string 获取19079XLH(string pageNumber)
+        {
+            string xlhOverride = XLH19079.Text.Trim();
+            return string.IsNullOrEmpty(xlhOverride) ? pageNumber : xlhOverride;
+        }
+
         private void 预览第一个PDF标签()
         {
             try
@@ -830,7 +836,7 @@ namespace BarTender_Dev_Dome
                     {
                         LabelFormatDocument labelFormat = btEngine.Documents.Open(获取当前PDF标签模板路径());
                         labelFormat.SubStrings.SetSubString("PDF", fileName);
-                        labelFormat.SubStrings.SetSubString("XLH", pageNumber);
+                        labelFormat.SubStrings.SetSubString("XLH", 获取19079XLH(pageNumber));
                         labelFormat.ExportImageToFile(_bmp_path, ImageType.BMP, Seagull.BarTender.Print.ColorDepth.ColorDepth24bit, new Resolution(407, 407), OverwriteOptions.Overwrite);
                     }
 
@@ -7082,7 +7088,7 @@ namespace BarTender_Dev_Dome
                                 labelFormat.SubStrings.SetSubString("PDF", pdfFileName);
 
                                 string pageNumber = Regex.Match(pdfFileName, @"page_(\d+)\.pdf").Groups[1].Value;
-                                labelFormat.SubStrings.SetSubString("XLH", pageNumber);
+                                labelFormat.SubStrings.SetSubString("XLH", 获取19079XLH(pageNumber));
                                 int excelRow = 2 + int.Parse(pageNumber) - 1;
 
                                 if (excelRow >= 2 && excelRow <= worksheet.Dimension.End.Row)
@@ -7110,7 +7116,7 @@ namespace BarTender_Dev_Dome
                             string pdfFileName = Path.GetFileName(pdfFilePath);
                             string pageNumber = Regex.Match(pdfFileName, @"page_(\d+)\.pdf").Groups[1].Value;
                             labelFormat.SubStrings.SetSubString("PDF", pdfFileName);
-                            labelFormat.SubStrings.SetSubString("XLH", pageNumber);
+                            labelFormat.SubStrings.SetSubString("XLH", 获取19079XLH(pageNumber));
 
                             for (int j = 0; j < 次数; j++)
                             {
@@ -7606,6 +7612,11 @@ namespace BarTender_Dev_Dome
         }
 
         private void cpxxBox_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void XLH19079_TextChanged(object sender, EventArgs e)
         {
 
         }
