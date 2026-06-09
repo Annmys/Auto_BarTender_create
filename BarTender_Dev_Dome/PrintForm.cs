@@ -642,6 +642,160 @@ namespace BarTender_Dev_Dome
             return string.Empty;
         }
 
+        private bool 当前标签规格是19079()
+        {
+            return comboBox_标签规格.Text.Contains("19079");
+        }
+
+        private string 获取当前型号类型()
+        {
+            if (checkBox_常规型号.Checked) { return "常规型号"; }
+            if (checkBox_客制型号.Checked) { return "客制型号"; }
+            if (checkBox_简化型号.Checked) { return "简化型号"; }
+            return "客制型号";
+        }
+
+        private string 获取当前PDF标签模板路径()
+        {
+            return Path.Combine(
+                @"\\192.168.1.33\Annmy\订单标签自动生成软件\moban",
+                标签种类_comboBox.Text,
+                获取当前型号类型(),
+                comboBox_标签规格.Text,
+                "1.btw");
+        }
+
+        private void 清空PDF拆分目录(string outputDirectory)
+        {
+            if (!Directory.Exists(outputDirectory))
+            {
+                Directory.CreateDirectory(outputDirectory);
+            }
+
+            string[] files = Directory.GetFiles(outputDirectory);
+            foreach (string file in files)
+            {
+                if ((File.GetAttributes(file) & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+                {
+                    File.SetAttributes(file, File.GetAttributes(file) & ~FileAttributes.ReadOnly);
+                }
+                File.Delete(file);
+            }
+        }
+
+        private bool 运行19079二维码PDF拆分(string inputPdf, string outputDirectory)
+        {
+            string scriptPath = Path.Combine(Application.StartupPath, "split_qr_pdf.py");
+            if (!File.Exists(scriptPath))
+            {
+                MessageBox.Show("未找到二维码拆分脚本: " + scriptPath, "错误");
+                return false;
+            }
+
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.FileName = "python.exe";
+            startInfo.Arguments = $"\"{scriptPath}\" \"{inputPdf}\" \"{outputDirectory}\"";
+            startInfo.UseShellExecute = false;
+            startInfo.RedirectStandardOutput = true;
+            startInfo.RedirectStandardError = true;
+            startInfo.CreateNoWindow = true;
+
+            try
+            {
+                using (Process process = Process.Start(startInfo))
+                {
+                    string output = process.StandardOutput.ReadToEnd();
+                    string error = process.StandardError.ReadToEnd();
+                    process.WaitForExit();
+
+                    if (process.ExitCode != 0 || !string.IsNullOrWhiteSpace(error))
+                    {
+                        MessageBox.Show($"二维码PDF拆分失败：{error}\n{output}", "错误");
+                        return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"执行二维码PDF拆分出错：{ex.Message}", "错误");
+                return false;
+            }
+
+            return Directory.GetFiles(outputDirectory, "*.pdf").Length > 0;
+        }
+
+        private void 预览第一个PDF标签()
+        {
+            try
+            {
+                string pdfSplitDirectory = Path.Combine(Application.StartupPath + @"\PDF拆分");
+                string firstPdf = Directory.GetFiles(pdfSplitDirectory, "*.pdf")
+                    .Select(Path.GetFileName)
+                    .OrderBy(fileName => int.Parse(fileName.Substring(5, fileName.Length - 9)))
+                    .FirstOrDefault();
+
+                if (string.IsNullOrEmpty(firstPdf))
+                {
+                    MessageBox.Show("没有可预览的拆分PDF。", "操作提示");
+                    return;
+                }
+
+                using (Engine btEngine = new Engine(true))
+                {
+                    LabelFormatDocument labelFormat = btEngine.Documents.Open(获取当前PDF标签模板路径());
+                    labelFormat.SubStrings.SetSubString("PDF", firstPdf);
+                    labelFormat.ExportImageToFile(_bmp_path, ImageType.BMP, Seagull.BarTender.Print.ColorDepth.ColorDepth24bit, new Resolution(407, 407), OverwriteOptions.Overwrite);
+                }
+
+                Form previewForm = new Form
+                {
+                    Text = "19079标签预览",
+                    Size = new Size(500, 400),
+                    BackColor = Color.White,
+                    FormBorderStyle = FormBorderStyle.Sizable,
+                    MaximizeBox = true,
+                    MinimizeBox = true
+                };
+
+                PictureBox pictureBox = new PictureBox
+                {
+                    Size = new Size(400, 300),
+                    Location = new Point(50, 50),
+                    BorderStyle = BorderStyle.FixedSingle,
+                    SizeMode = PictureBoxSizeMode.Zoom,
+                    BackColor = Color.White
+                };
+
+                Button closeButton = new Button
+                {
+                    Text = "关闭预览",
+                    Location = new Point(10, 10),
+                    Size = new Size(100, 30)
+                };
+                closeButton.Click += (s, args) => previewForm.Close();
+
+                System.Drawing.Image image = System.Drawing.Image.FromFile(_bmp_path);
+                pictureBox.Image = new Bitmap(image);
+                image.Dispose();
+
+                previewForm.Controls.Add(closeButton);
+                previewForm.Controls.Add(pictureBox);
+                previewForm.FormClosed += (s, args) =>
+                {
+                    if (pictureBox.Image != null)
+                    {
+                        pictureBox.Image.Dispose();
+                        pictureBox.Image = null;
+                    }
+                };
+                previewForm.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"生成19079预览失败：{ex.Message}", "错误");
+            }
+        }
+
         //软件开启加载标签种类
         private void PrintForm_Load(object sender, EventArgs e)
         {
@@ -6559,6 +6713,11 @@ namespace BarTender_Dev_Dome
                 提示框.AppendText("13453:加载PDF所在文件夹" + Environment.NewLine);
                 提示框.AppendText("13453:附件打印数量需要导入数据库控制" + Environment.NewLine);
             }
+            if (comboBox_标签规格.Text.Contains("19079"))
+            {
+                提示框.AppendText("19079:加载原始二维码PDF后会按二维码拆分并预览第一个标签" + Environment.NewLine);
+                提示框.AppendText("19079:附件打印数量可导入数据库控制，规则同13453" + Environment.NewLine);
+            }
 
             if (标签种类_comboBox.Text.Contains("唛头"))
             {
@@ -6623,7 +6782,34 @@ namespace BarTender_Dev_Dome
 
         private void button_加载PDF_Click(object sender, EventArgs e)
         {
-            if (comboBox_标签规格.Text.Contains("13453"))
+            if (当前标签规格是19079())
+            {
+                ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+
+                OpenFileDialog dialog = new OpenFileDialog();
+                dialog.Multiselect = false;
+                dialog.Title = "请选择19079原始二维码PDF";
+                dialog.Filter = "pdf文件(*.pdf)|*.pdf|All files (*.*)|*.*";
+                dialog.InitialDirectory = Application.StartupPath;
+
+                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    textBox_pdf.Text = dialog.FileName;
+                    string outputDirectory = Path.Combine(Application.StartupPath + @"\PDF拆分");
+                    清空PDF拆分目录(outputDirectory);
+
+                    if (运行19079二维码PDF拆分(dialog.FileName, outputDirectory))
+                    {
+                        MessageBox.Show("19079二维码PDF拆分完成！", "成功");
+                        预览第一个PDF标签();
+                    }
+                    else
+                    {
+                        MessageBox.Show("19079二维码PDF未拆分出任何文件。", "操作提示");
+                    }
+                }
+            }
+            else if (comboBox_标签规格.Text.Contains("13453"))
             {
                 ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
 
@@ -6758,7 +6944,86 @@ namespace BarTender_Dev_Dome
 
         private void button_打印PDF_Click(object sender, EventArgs e)
         {
-            if (comboBox_标签规格.Text.Contains("13453"))
+            if (当前标签规格是19079())
+            {
+                using (Engine btEngine = new Engine(true))
+                {
+                    string pdfSplitDirectory = Path.Combine(Application.StartupPath + @"\PDF拆分");
+                    if (!Directory.Exists(pdfSplitDirectory))
+                    {
+                        MessageBox.Show("PDF拆分目录不存在。");
+                        return;
+                    }
+
+                    var pdfFiles = Directory.GetFiles(pdfSplitDirectory, "*.pdf")
+                      .Select(Path.GetFileName)
+                      .OrderBy(fileName => int.Parse(fileName.Substring(5, fileName.Length - 9)))
+                      .ToList();
+
+                    if (pdfFiles.Count == 0)
+                    {
+                        MessageBox.Show("PDF拆分目录中没有可打印的PDF。");
+                        return;
+                    }
+
+                    LabelFormatDocument labelFormat = btEngine.Documents.Open(获取当前PDF标签模板路径());
+                    labelFormat.PrintSetup.PrinterName = _PrinterName;
+
+                    int 次数 = Convert.ToInt32(textBox1.Text);
+                    if (labelFormat == null || 次数 <= 0)
+                    {
+                        MessageBox.Show("无法打开标签文件或打印次数无效。");
+                        return;
+                    }
+
+                    if (!string.IsNullOrEmpty(Box_数据库.Text))
+                    {
+                        string filePath = Box_数据库.Text;
+                        using (var package = new ExcelPackage(new FileInfo(filePath)))
+                        {
+                            var worksheet = package.Workbook.Worksheets[0];
+
+                            for (int i = 0; i < pdfFiles.Count; i++)
+                            {
+                                string pdfFileName = pdfFiles[i];
+                                labelFormat.SubStrings.SetSubString("PDF", pdfFileName);
+
+                                string pageNumber = Regex.Match(pdfFileName, @"page_(\d+)\.pdf").Groups[1].Value;
+                                int excelRow = 2 + int.Parse(pageNumber) - 1;
+
+                                if (excelRow >= 2 && excelRow <= worksheet.Dimension.End.Row)
+                                {
+                                    var gData = worksheet.Cells[excelRow, 7].Value?.ToString() ?? "0";
+                                    int 次数1 = Convert.ToInt32(gData);
+
+                                    for (int i1 = 0; i1 < 次数1; i1++)
+                                    {
+                                        labelFormat.Print("BarPrint" + DateTime.Now, 300);
+                                    }
+                                }
+                                else
+                                {
+                                    MessageBox.Show($"工作表中没有找到对应的行: {excelRow}");
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < pdfFiles.Count; i++)
+                        {
+                            string pdfFileName = pdfFiles[i];
+                            labelFormat.SubStrings.SetSubString("PDF", pdfFileName);
+
+                            for (int j = 0; j < 次数; j++)
+                            {
+                                labelFormat.Print("BarPrint" + DateTime.Now, 300);
+                            }
+                        }
+                    }
+                }
+            }
+            else if (comboBox_标签规格.Text.Contains("13453"))
             {
                 using (Engine btEngine = new Engine(true))
                 {
